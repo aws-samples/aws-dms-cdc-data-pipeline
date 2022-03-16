@@ -133,6 +133,7 @@ class KinesisFirehoseStack(Stack):
         "compressionFormat": "UNCOMPRESSED", # [GZIP | HADOOP_SNAPPY | Snappy | UNCOMPRESSED | ZIP]
         # Kinesis Data Firehose automatically appends the “YYYY/MM/dd/HH/” UTC prefix to delivered S3 files. You can also specify
         # an extra prefix in front of the time format and add "/" to the end to have it appear as a folder in the S3 console.
+        "errorOutputPrefix": "error/",
         "prefix": f"{OPENSEARCH_INDEX_NAME.value_as_string}/"
       },
 
@@ -151,7 +152,7 @@ class KinesisFirehoseStack(Stack):
       retry_options={
         "durationInSeconds": 60
       },
-      s3_backup_mode="FailedDocumentsOnly", # [AllDocuments | FailedDocumentsOnly]
+      s3_backup_mode="AllDocuments", # [AllDocuments | FailedDocumentsOnly]
       vpc_configuration=opensearch_dest_vpc_config
     )
 
