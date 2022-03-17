@@ -19,7 +19,7 @@ random.seed(47)
 
 class KinesisFirehoseStack(Stack):
 
-  def __init__(self, scope: Construct, construct_id: str, vpc, kinesis_stream_name, ops_domain_arn, ops_client_sg_id, **kwargs) -> None:
+  def __init__(self, scope: Construct, construct_id: str, vpc, kinesis_stream_arn, ops_domain_arn, ops_client_sg_id, **kwargs) -> None:
     super().__init__(scope, construct_id, **kwargs)
 
     OPENSEARCH_INDEX_NAME = cdk.CfnParameter(self, 'SearchIndexName',
@@ -155,12 +155,6 @@ class KinesisFirehoseStack(Stack):
       s3_backup_mode="AllDocuments", # [AllDocuments | FailedDocumentsOnly]
       vpc_configuration=opensearch_dest_vpc_config
     )
-
-    # arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
-    kinesis_stream_arn=self.format_arn(service='kinesis',
-      region=cdk.Aws.REGION, account=cdk.Aws.ACCOUNT_ID,
-      resource='stream', arn_format=cdk.ArnFormat.SLASH_RESOURCE_NAME,
-      resource_name=kinesis_stream_name)
 
     firehose_to_ops_delivery_stream = aws_kinesisfirehose.CfnDeliveryStream(self, "KinesisFirehoseToOPS",
       delivery_stream_name=OPENSEARCH_INDEX_NAME.value_as_string,

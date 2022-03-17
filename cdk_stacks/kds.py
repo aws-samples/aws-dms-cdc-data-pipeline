@@ -20,14 +20,17 @@ class KinesisDataStreamStack(Stack):
       default='dms-cdc'
     )
 
-    self.kinesis_stream = aws_kinesis.Stream(self, 'DMSTargetKinesisStream',
+    kinesis_stream = aws_kinesis.Stream(self, 'DMSTargetKinesisStream',
       retention_period=Duration.hours(24),
       stream_mode=aws_kinesis.StreamMode.ON_DEMAND,
       stream_name=kinesis_stream_name.value_as_string
     )
 
-    cdk.CfnOutput(self, 'DMSTargetKinesisStreamName', value=self.kinesis_stream.stream_name,
+    self.kinesis_stream_name = kinesis_stream.stream_name
+    self.kinesis_stream_arn = kinesis_stream.stream_arn
+
+    cdk.CfnOutput(self, 'DMSTargetKinesisStreamName', value=self.kinesis_stream_name,
       export_name='DMSTargetKinesisStreamName')
-    cdk.CfnOutput(self, 'DMSTargetKinesisStreamArn', value=self.kinesis_stream.stream_arn,
+    cdk.CfnOutput(self, 'DMSTargetKinesisStreamArn', value=self.kinesis_stream_arn,
       export_name='DMSTargetKinesisStreamArn')
 

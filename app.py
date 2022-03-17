@@ -29,7 +29,7 @@ kds_stack = KinesisDataStreamStack(app, 'DMSTargetKinesisDataStreamStack')
 dms_stack = DMSAuroraMysqlToKinesisStack(app, 'DMSAuroraMysqlToKinesisStack',
   vpc_stack.vpc,
   aurora_mysql_stack.sg_mysql_client,
-  kds_stack.kinesis_stream.stream_name
+  kds_stack.kinesis_stream_arn
 )
 
 ops_stack = OpenSearchStack(app, 'OpenSearchStack',
@@ -38,7 +38,7 @@ ops_stack = OpenSearchStack(app, 'OpenSearchStack',
 
 firehose_stack = KinesisFirehoseStack(app, 'FirehoseStack',
   vpc_stack.vpc,
-  kds_stack.kinesis_stream.stream_name,
+  kds_stack.kinesis_stream_arn,
   ops_stack.ops_domain_arn,
   ops_stack.ops_client_sg_id
 )

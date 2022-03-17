@@ -15,7 +15,7 @@ from constructs import Construct
 
 class DMSAuroraMysqlToKinesisStack(Stack):
 
-  def __init__(self, scope: Construct, construct_id: str, vpc, db_client_sg, target_kinesis_stream_name, **kwargs) -> None:
+  def __init__(self, scope: Construct, construct_id: str, vpc, db_client_sg, target_kinesis_stream_arn, **kwargs) -> None:
     super().__init__(scope, construct_id, **kwargs)
 
     database_name = cdk.CfnParameter(self, 'SourceDatabaseName',
@@ -90,12 +90,7 @@ class DMSAuroraMysqlToKinesisStack(Stack):
       kinesis_settings=aws_dms.CfnEndpoint.KinesisSettingsProperty(
         message_format="json-unformatted",
         service_access_role_arn=dms_target_kinesis_access_role.role_arn,
-        # arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
-        stream_arn=self.format_arn(service='kinesis',
-          region=cdk.Aws.REGION, account=cdk.Aws.ACCOUNT_ID,
-          resource='stream', arn_format=cdk.ArnFormat.SLASH_RESOURCE_NAME,
-          resource_name=target_kinesis_stream_name)
-      )
+        stream_arn=target_kinesis_stream_arn)
     )
 
     table_mappings_json = {
