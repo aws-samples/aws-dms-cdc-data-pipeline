@@ -21,7 +21,7 @@ class VpcStack(Stack):
     #
     vpc_name = self.node.try_get_context('vpc_name')
     self.vpc = aws_ec2.Vpc.from_lookup(self, 'ExistingVPC',
-      is_default=True,
+      # is_default=True,
       vpc_name=vpc_name
     )
 

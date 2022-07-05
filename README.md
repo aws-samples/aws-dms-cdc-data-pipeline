@@ -177,6 +177,7 @@ At this point you can now synthesize the CloudFormation template for this code.
 
   <pre>
   (.venv) $ cdk deploy \
+                -c vpc_name='<i>your-existing-vpc-name</i>' \
                 -e DMSTargetKinesisDataStreamStack \
                 --parameters TargetKinesisStreamName=<i>your-kinesis-stream-name</i>
   </pre>
@@ -185,6 +186,7 @@ At this point you can now synthesize the CloudFormation template for this code.
   For example, we already created the sample database (i.e. `testdb`) and table (`retail_trans`)
   <pre>
   (.venv) $ cdk deploy \
+                -c vpc_name='<i>your-existing-vpc-name</i>' \
                 -e DMSAuroraMysqlToKinesisStack \
                 --parameters SourceDatabaseName=<i>testdb</i> \
                 --parameters SourceTableName=<i>retail_trans</i>
@@ -194,6 +196,7 @@ At this point you can now synthesize the CloudFormation template for this code.
 
   <pre>
   (.venv) $ cdk deploy \
+                -c vpc_name='<i>your-existing-vpc-name</i>' \
                 -e OpenSearchStack \
                 --parameters EC2KeyPairName="<i>your-ec2-key-pair-name(exclude .pem extension)</i>" \
                 --parameters OpenSearchDomainName="<i>your-opensearch-domain-name</i>"
@@ -203,6 +206,7 @@ At this point you can now synthesize the CloudFormation template for this code.
 
   <pre>
   (.venv) $ cdk deploy \
+                -c vpc_name='<i>your-existing-vpc-name</i>' \
                 -e FirehoseStack \
                 --parameters SearchIndexName="<i>your-opensearch-index-name</i>"
   </pre>
