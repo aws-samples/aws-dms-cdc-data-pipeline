@@ -78,6 +78,8 @@ At this point you can now synthesize the CloudFormation template for this code.
 
 ## Confirm that binary logging is enabled
 
+<b><em>In order to set up the Aurora MySQL, you need to connect the Aurora MySQL cluster on either your local PC or a EC2 instance.</em></b>
+
 1. Connect to the Aurora cluster writer node.
    <pre>
     $ mysql -h<i>db-cluster-name</i>.cluster-<i>xxxxxxxxxxxx</i>.<i>region-name</i>.rds.amazonaws.com -uadmin -p
@@ -172,6 +174,8 @@ At this point you can now synthesize the CloudFormation template for this code.
 
     MySQL [testdb]>    
    </pre>
+
+<b><em>After setting up the Aurora MySQL, you should come back to the terminal where you are deploying stacks.</em></b>
 
 ## Create Amazon Kinesis Data Streams for AWS DMS target endpoint
 
