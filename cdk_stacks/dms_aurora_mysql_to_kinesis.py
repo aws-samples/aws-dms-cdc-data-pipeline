@@ -125,6 +125,7 @@ class DMSAuroraMysqlToKinesisStack(Stack):
 
     #XXX: AWS DMS - Using Amazon Kinesis Data Streams as a target for AWS Database Migration Service
     # https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Target.Kinesis.html
+    # When using "ParallelApply*" task settings, the "partition-key-type" default is the primary-key of the table, not "schema-name.table-name".
     task_settings_json = {
       # Multithreaded full load task settings
       "FullLoadSettings": {
