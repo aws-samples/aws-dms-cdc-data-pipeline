@@ -88,6 +88,10 @@ class DMSAuroraMysqlToKinesisStack(Stack):
       endpoint_type='target',
       engine_name='kinesis',
       kinesis_settings=aws_dms.CfnEndpoint.KinesisSettingsProperty(
+        # MessageFormat
+        #  L json-unformatted: a single line JSON string with new line format
+        #  L json: an attribute-value pair in JSON format
+        # Link: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dms-endpoint-kinesissettings.html
         message_format="json-unformatted",
         service_access_role_arn=dms_target_kinesis_access_role.role_arn,
         stream_arn=target_kinesis_stream_arn)

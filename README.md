@@ -350,7 +350,7 @@ In the next step, you map the IAM role that Kinesis Data Firehose uses to the ro
         "timestamp": "2022-03-14T14:18:11.104009Z",
         "record-type": "data",
         "operation": "insert",
-        "partition-key-type": "schema-table",
+        "partition-key-type": "primary-key",
         "schema-name": "testdb",
         "table-name": "retail_trans",
         "transaction-id": 8590392498
