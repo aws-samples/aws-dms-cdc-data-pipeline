@@ -6,12 +6,15 @@ import boto3
 
 import aws_cdk as cdk
 
-from cdk_stacks.vpc import VpcStack
-from cdk_stacks.aurora_mysql import AuroraMysqlStack
-from cdk_stacks.kds import KinesisDataStreamStack
-from cdk_stacks.dms_aurora_mysql_to_kinesis import DMSAuroraMysqlToKinesisStack
-from cdk_stacks.ops import OpenSearchStack
-from cdk_stacks.firehose import KinesisFirehoseStack
+from cdk_stacks import (
+  VpcStack,
+  AuroraMysqlStack,
+  KinesisDataStreamStack,
+  DMSAuroraMysqlToKinesisStack,
+  OpenSearchStack,
+  KinesisFirehoseStack
+)
+
 
 app = cdk.App()
 

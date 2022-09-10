@@ -99,7 +99,9 @@ class OpenSearchStack(Stack):
     # You should camelCase the property names instead of PascalCase
     opensearch_domain = aws_opensearchservice.Domain(self, "OpenSearch",
       domain_name=OPENSEARCH_DOMAIN_NAME.value_as_string,
-      version=aws_opensearchservice.EngineVersion.OPENSEARCH_1_0,
+      #XXX: Supported versions of OpenSearch and Elasticsearch
+      # https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html#choosing-version
+      version=aws_opensearchservice.EngineVersion.OPENSEARCH_1_3,
       #XXX: You cannot use graviton instances with non-graviton instances.
       # Use graviton instances as data nodes or use non-graviton instances as master nodes.
       capacity={
@@ -110,7 +112,7 @@ class OpenSearchStack(Stack):
       },
       ebs={
         "volume_size": 10,
-        "volume_type": aws_ec2.EbsDeviceVolumeType.GP2
+        "volume_type": aws_ec2.EbsDeviceVolumeType.GP3
       },
       #XXX: az_count must be equal to vpc subnets count.
       zone_awareness={
@@ -135,9 +137,12 @@ class OpenSearchStack(Stack):
       },
       use_unsigned_basic_auth=True,
       security_groups=[sg_opensearch_cluster],
-      automated_snapshot_start_hour=17, # 2 AM (GTM+9)
+      #XXX: For domains running OpenSearch or Elasticsearch 5.3 and later, OpenSearch Service takes hourly automated snapshots
+      # Only applies for Elasticsearch versions below 5.3
+      # automated_snapshot_start_hour=17, # 2 AM (GTM+9)
       vpc=vpc,
-      vpc_subnets=[aws_ec2.SubnetSelection(one_per_az=True, subnet_type=aws_ec2.SubnetType.PRIVATE_WITH_NAT)],
+      #XXX: az_count must be equal to vpc subnets count.
+      vpc_subnets=[aws_ec2.SubnetSelection(one_per_az=True, subnet_type=aws_ec2.SubnetType.PRIVATE_WITH_EGRESS)],
       removal_policy=cdk.RemovalPolicy.DESTROY # default: cdk.RemovalPolicy.RETAIN
     )
     cdk.Tags.of(opensearch_domain).add('Name', f'{OPENSEARCH_DOMAIN_NAME.value_as_string}')
