@@ -326,6 +326,8 @@ In the next step, you map the IAM role that Kinesis Data Firehose uses to the ro
                    --host <i>db-cluster-name</i>.cluster-<i>xxxxxxxxxxxx</i>.<i>region-name</i>.rds.amazonaws.com \
                    --max-count 200
    </pre>
+   In the Data Viewer in the Amazon Kinesis Management Console, you can see incomming records.
+   ![amazon-kinesis-data-viewer](./assets/amazon-kinesis-data-viewer.png)
 
 3. Check the Amazon OpenSearch Discover Dashboard `5~10` minutes later, and you will see data ingested from the Aurora MySQL.<br/>
   For example,
@@ -402,6 +404,7 @@ Enjoy!
  * [Windows SSH / Tunnel for Kibana Instructions - Amazon Elasticsearch Service](https://search-sa-log-solutions.s3-us-east-2.amazonaws.com/logstash/docs/Kibana_Proxy_SSH_Tunneling_Windows.pdf)
  * [Use an SSH Tunnel to access Kibana within an AWS VPC with PuTTy on Windows](https://amazonmsk-labs.workshop.aws/en/mskkdaflinklab/createesdashboard.html)
  * [OpenSearch Popular APIs](https://opensearch.org/docs/latest/opensearch/popular-api/)
+ * [Using Data Viewer in the Kinesis Console](https://docs.aws.amazon.com/streams/latest/dev/data-viewer.html)
 
 ## Security
 
