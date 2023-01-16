@@ -327,7 +327,7 @@ In the next step, you map the IAM role that Kinesis Data Firehose uses to the ro
                    --max-count 200
    </pre>
 
-3. Check Amazon OpenSearch Dashboards 5~10 minutes later, and you will see data ingested from the Aurora MySQL.<br/>
+3. Check the Amazon OpenSearch Discover Dashboard `5~10` minutes later, and you will see data ingested from the Aurora MySQL.<br/>
   For example,
    <pre>
    {
@@ -379,7 +379,7 @@ In the next step, you map the IAM role that Kinesis Data Firehose uses to the ro
 
 2. Delete the CloudFormation stack by running the below command.
    <pre>
-   (.venv) $ cdk destroy
+   (.venv) $ cdk destroy --all
    </pre>
 
 ## Useful commands
