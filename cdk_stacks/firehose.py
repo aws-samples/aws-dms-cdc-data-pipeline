@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import random
+import re
 import string
 
 import aws_cdk as cdk
@@ -22,10 +23,10 @@ class KinesisFirehoseStack(Stack):
   def __init__(self, scope: Construct, construct_id: str, vpc, kinesis_stream_arn, ops_domain_arn, ops_client_sg_id, **kwargs) -> None:
     super().__init__(scope, construct_id, **kwargs)
 
-    OPENSEARCH_INDEX_NAME = cdk.CfnParameter(self, 'SearchIndexName',
-      type='String',
-      description='Amazon OpenSearch Service index name'
-    )
+    #XXX: OpenSearch Index naming restrictions
+    # https://opensearch.org/docs/2.4/api-reference/index-apis/create-index/#index-naming-restrictions
+    OPENSEARCH_INDEX_NAME = self.node.try_get_context('opensearch_index_name')
+    assert re.fullmatch(r'[a-z][a-z0-9\-_]+', OPENSEARCH_INDEX_NAME), 'Invalid domain name'
 
     S3_BUCKET_SUFFIX = ''.join(random.sample((string.ascii_lowercase + string.digits), k=7))
     s3_bucket = s3.Bucket(self, "s3bucket",
@@ -75,17 +76,17 @@ class KinesisFirehoseStack(Stack):
         ops_domain_arn,
         f"{ops_domain_arn}/_all/_settings",
         f"{ops_domain_arn}/_cluster/stats",
-        f"{ops_domain_arn}/{OPENSEARCH_INDEX_NAME.value_as_string}*/_mapping/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%",
+        f"{ops_domain_arn}/{OPENSEARCH_INDEX_NAME}*/_mapping/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%",
         f"{ops_domain_arn}/_nodes",
         f"{ops_domain_arn}/_nodes/stats",
         f"{ops_domain_arn}/_nodes/*/stats",
         f"{ops_domain_arn}/_stats",
-        f"{ops_domain_arn}/{OPENSEARCH_INDEX_NAME.value_as_string}*/_stats"
+        f"{ops_domain_arn}/{OPENSEARCH_INDEX_NAME}*/_stats"
       ],
       actions=["es:ESHttpGet"]
     ))
 
-    firehose_log_group_name = f"/aws/kinesisfirehose/{OPENSEARCH_INDEX_NAME.value_as_string}"
+    firehose_log_group_name = f"/aws/kinesisfirehose/{OPENSEARCH_INDEX_NAME}"
     firehose_role_policy_doc.add_statements(aws_iam.PolicyStatement(
       effect=aws_iam.Effect.ALLOW,
       #XXX: The ARN will be formatted as follows:
@@ -96,7 +97,7 @@ class KinesisFirehoseStack(Stack):
     ))
 
     firehose_role = aws_iam.Role(self, "KinesisFirehoseServiceRole",
-      role_name=f"KinesisFirehoseServiceRole-{OPENSEARCH_INDEX_NAME.value_as_string}-{cdk.Aws.REGION}",
+      role_name=f"KinesisFirehoseServiceRole-{OPENSEARCH_INDEX_NAME}-{cdk.Aws.REGION}",
       assumed_by=aws_iam.ServicePrincipal("firehose.amazonaws.com"),
       #XXX: use inline_policies to work around https://github.com/aws/aws-cdk/issues/5221
       inline_policies={
@@ -114,7 +115,7 @@ class KinesisFirehoseStack(Stack):
     )
 
     opensearch_dest_config = aws_kinesisfirehose.CfnDeliveryStream.AmazonopensearchserviceDestinationConfigurationProperty(
-      index_name=OPENSEARCH_INDEX_NAME.value_as_string,
+      index_name=OPENSEARCH_INDEX_NAME,
       role_arn=firehose_role.role_arn,
       s3_configuration={
         "bucketArn": s3_bucket.bucket_arn,
@@ -134,7 +135,7 @@ class KinesisFirehoseStack(Stack):
         # Kinesis Data Firehose automatically appends the “YYYY/MM/dd/HH/” UTC prefix to delivered S3 files. You can also specify
         # an extra prefix in front of the time format and add "/" to the end to have it appear as a folder in the S3 console.
         "errorOutputPrefix": "error/",
-        "prefix": f"{OPENSEARCH_INDEX_NAME.value_as_string}/"
+        "prefix": f"{OPENSEARCH_INDEX_NAME}/"
       },
 
       # the properties below are optional
@@ -157,14 +158,14 @@ class KinesisFirehoseStack(Stack):
     )
 
     firehose_to_ops_delivery_stream = aws_kinesisfirehose.CfnDeliveryStream(self, "KinesisFirehoseToOPS",
-      delivery_stream_name=OPENSEARCH_INDEX_NAME.value_as_string,
+      delivery_stream_name=OPENSEARCH_INDEX_NAME,
       delivery_stream_type="KinesisStreamAsSource",
       kinesis_stream_source_configuration=aws_kinesisfirehose.CfnDeliveryStream.KinesisStreamSourceConfigurationProperty(
         kinesis_stream_arn=kinesis_stream_arn,
         role_arn=firehose_role.role_arn
       ),
       amazonopensearchservice_destination_configuration=opensearch_dest_config,
-      tags=[{"key": "Name", "value": OPENSEARCH_INDEX_NAME.value_as_string}]
+      tags=[{"key": "Name", "value": OPENSEARCH_INDEX_NAME}]
     )
 
     cdk.CfnOutput(self, '{}_S3DestBucket'.format(self.stack_name), value=s3_bucket.bucket_name, export_name='S3DestBucket')

@@ -2,6 +2,7 @@
 
 import json
 import random
+import re
 import string
 
 import aws_cdk as cdk
@@ -23,17 +24,13 @@ class OpenSearchStack(Stack):
   def __init__(self, scope: Construct, construct_id: str, vpc, **kwargs) -> None:
     super().__init__(scope, construct_id, **kwargs)
 
-    OPENSEARCH_DOMAIN_NAME = cdk.CfnParameter(self, 'OpenSearchDomainName',
-      type='String',
-      description='Amazon OpenSearch Service domain name',
-      default='opensearch-{}'.format(''.join(random.sample((string.ascii_letters), k=5))),
-      allowed_pattern='[a-z]+[A-Za-z0-9\-]+'
-    )
+    #XXX: Amazon OpenSearch Service Domain naming restrictions
+    # https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html#createdomains
+    OPENSEARCH_DEFAULT_DOMAIN_NAME = 'opensearch-{}'.format(''.join(random.sample((string.ascii_letters), k=5)))
+    opensearch_domain_name = self.node.try_get_context('opensearch_domain_name') or OPENSEARCH_DEFAULT_DOMAIN_NAME
+    assert re.fullmatch(r'([a-z][a-z0-9\-]+){3,28}?', opensearch_domain_name), 'Invalid domain name'
 
-    EC2_KEY_PAIR_NAME = cdk.CfnParameter(self, 'EC2KeyPairName',
-      type='String',
-      description='Amazon EC2 Instance KeyPair name'
-    )
+    ec2_key_pair_name = self.node.try_get_context('ec2_key_pair_name')
 
     #XXX: https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_ec2/InstanceClass.html
     #XXX: https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_ec2/InstanceSize.html#aws_cdk.aws_ec2.InstanceSize
@@ -56,7 +53,7 @@ class OpenSearchStack(Stack):
       machine_image=aws_ec2.MachineImage.latest_amazon_linux(),
       vpc_subnets=aws_ec2.SubnetSelection(subnet_type=aws_ec2.SubnetType.PUBLIC),
       security_group=sg_bastion_host,
-      key_name=EC2_KEY_PAIR_NAME.value_as_string
+      key_name=ec2_key_pair_name
     )
 
     sg_use_opensearch = aws_ec2.SecurityGroup(self, "OpenSearchClientSG",
@@ -98,7 +95,7 @@ class OpenSearchStack(Stack):
     #XXX: aws cdk elastsearch example - https://github.com/aws/aws-cdk/issues/2873
     # You should camelCase the property names instead of PascalCase
     opensearch_domain = aws_opensearchservice.Domain(self, "OpenSearch",
-      domain_name=OPENSEARCH_DOMAIN_NAME.value_as_string,
+      domain_name=opensearch_domain_name,
       #XXX: Supported versions of OpenSearch and Elasticsearch
       # https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html#choosing-version
       version=aws_opensearchservice.EngineVersion.OPENSEARCH_1_3,
@@ -145,7 +142,7 @@ class OpenSearchStack(Stack):
       vpc_subnets=[aws_ec2.SubnetSelection(one_per_az=True, subnet_type=aws_ec2.SubnetType.PRIVATE_WITH_EGRESS)],
       removal_policy=cdk.RemovalPolicy.DESTROY # default: cdk.RemovalPolicy.RETAIN
     )
-    cdk.Tags.of(opensearch_domain).add('Name', f'{OPENSEARCH_DOMAIN_NAME.value_as_string}')
+    cdk.Tags.of(opensearch_domain).add('Name', opensearch_domain_name)
     self.ops_domain_arn = opensearch_domain.domain_arn
 
     cdk.CfnOutput(self, 'BastionHostId', value=bastion_host.instance_id, export_name='BastionHostId')

@@ -47,14 +47,37 @@ To add additional dependencies, for example other CDK libraries, just add
 them to your `setup.py` file and rerun the `pip install -r requirements.txt`
 command.
 
-At this point you can now synthesize the CloudFormation template for this code.
+
+
+Before synthesizing the CloudFormation, you should set approperly the cdk context configuration file, `cdk.context.json`.
+
+For example:
+<pre>
+{
+  "vpc_name": "<i>your-existing-vpc-name</i>",
+  "db_cluster_name": "<i>db-cluster-name</i>",
+  "db_secret_name": "<i>your-db-secret-name</i>",
+  "dms_data_source": {
+    "database_name": "<i>testdb</i>",
+    "table_name": "<i>retail_trans</i>"
+  },
+  "kinesis_stream_name": "<i>your-dms-target-kinesis-stream-name</i>",
+  "opensearch_domain_name": "<i>your-opensearch-domain-name</i>",
+  "opensearch_index_name": "<i>your-opensearch-index-name</i>",
+  "ec2_key_pair_name": "<i>your-ec2-key-pair-name(exclude .pem extension)</i>"
+}
+</pre>
+
+:warning: `ec2_key_pair_name` option should be entered without the `.pem` extension.
+
+Now you can now synthesize the CloudFormation template for this code.
 
 ## Creating Aurora MySQL cluster
 
 1. :information_source: Create an AWS Secret for your RDS Admin user like this:
    <pre>
    (.venv) $ aws secretsmanager create-secret \
-      --name <i>"your_db_secret_name"</i> \
+      --name "<i>your_db_secret_name</i>" \
       --description "<i>(Optional) description of the secret</i>" \
       --secret-string '{"username": "admin", "password": <i>"password_of_at_last_8_characters"</i>}'
    </pre>
@@ -68,12 +91,7 @@ At this point you can now synthesize the CloudFormation template for this code.
 
 2. Create an Aurora MySQL Cluster
    <pre>
-   (.venv) $ cdk deploy \
-                 -c vpc_name='<i>your-existing-vpc-name</i>' \
-                 -c db_secret_name='<i>db-secret-name</i>' \
-                 -c db_cluster_name='<i>db-cluster-name</i>' \
-                 VpcStack \
-                 AuroraMysqlStack
+   (.venv) $ cdk deploy VpcStack AuroraMysqlStack
    </pre>
 
 ## Confirm that binary logging is enabled
@@ -92,12 +110,12 @@ At this point you can now synthesize the CloudFormation template for this code.
 
     Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
-    MySQL [(none)]> show global variables like "log_bin";
+    MySQL [(none)]>
    </pre>
 
 2. At SQL prompt run the below command to confirm that binary logging is enabled:
    <pre>
-    MySQL [(none)]> show global variables like "log_bin";
+    MySQL [(none)]> SHOW GLOBAL VARIABLES LIKE "log_bin";
     +---------------+-------+
     | Variable_name | Value |
     +---------------+-------+
@@ -108,7 +126,7 @@ At this point you can now synthesize the CloudFormation template for this code.
 
 3. Also run this to AWS DMS has bin log access that is required for replication
    <pre>
-    MySQL [(none)]> call mysql.rds_set_configuration('binlog retention hours', 24);
+    MySQL [(none)]> CALL mysql.rds_set_configuration('binlog retention hours', 24);
     Query OK, 0 rows affected (0.01 sec)
    </pre>
 
@@ -116,7 +134,7 @@ At this point you can now synthesize the CloudFormation template for this code.
 
 1. Run the below command to create the sample database named `testdb`.
    <pre>
-    MySQL [(none)]> show databases;
+    MySQL [(none)]> SHOW DATABASES;
     +--------------------+
     | Database           |
     +--------------------+
@@ -127,12 +145,12 @@ At this point you can now synthesize the CloudFormation template for this code.
     +--------------------+
     4 rows in set (0.00 sec)
 
-    MySQL [(none)]> create database testdb;
+    MySQL [(none)]> CREATE DATABASE IF NOT EXISTS testdb;
     Query OK, 1 row affected (0.01 sec)
 
-    MySQL [(none)]> use testdb;
+    MySQL [(none)]> USE testdb;
     Database changed
-    MySQL [testdb]> show tables;
+    MySQL [testdb]> SHOW TABLES;
     Empty set (0.00 sec)
    </pre>
 2. Also run this to create the sample table named `retail_trans`
@@ -150,7 +168,7 @@ At this point you can now synthesize the CloudFormation template for this code.
         -> ) ENGINE=InnoDB AUTO_INCREMENT=0;
     Query OK, 0 rows affected, 1 warning (0.04 sec)
 
-    MySQL [testdb]> show tables;
+    MySQL [testdb]> SHOW TABLES;
     +------------------+
     | Tables_in_testdb |
     +------------------+
@@ -158,7 +176,7 @@ At this point you can now synthesize the CloudFormation template for this code.
     +------------------+
     1 row in set (0.00 sec)
 
-    MySQL [testdb]> desc retail_trans;
+    MySQL [testdb]> DESC retail_trans;
     +----------------+-------------+------+-----+-------------------+-------------------+
     | Field          | Type        | Null | Key | Default           | Extra             |
     +----------------+-------------+------+-----+-------------------+-------------------+
@@ -180,39 +198,25 @@ At this point you can now synthesize the CloudFormation template for this code.
 ## Create Amazon Kinesis Data Streams for AWS DMS target endpoint
 
   <pre>
-  (.venv) $ cdk deploy \
-                -c vpc_name='<i>your-existing-vpc-name</i>' \
-                -e DMSTargetKinesisDataStreamStack \
-                --parameters TargetKinesisStreamName=<i>your-kinesis-stream-name</i>
+  (.venv) $ cdk deploy DMSTargetKinesisDataStreamStack
   </pre>
 
 ## Create AWS DMS Replication Task
   For example, we already created the sample database (i.e. `testdb`) and table (`retail_trans`)
   <pre>
-  (.venv) $ cdk deploy \
-                -c vpc_name='<i>your-existing-vpc-name</i>' \
-                -e DMSAuroraMysqlToKinesisStack \
-                --parameters SourceDatabaseName=<i>testdb</i> \
-                --parameters SourceTableName=<i>retail_trans</i>
+  (.venv) $ cdk deploy DMSAuroraMysqlToKinesisStack
   </pre>
 
 ## Create Amazon OpenSearch Service
 
   <pre>
-  (.venv) $ cdk deploy \
-                -c vpc_name='<i>your-existing-vpc-name</i>' \
-                -e OpenSearchStack \
-                --parameters EC2KeyPairName="<i>your-ec2-key-pair-name(exclude .pem extension)</i>" \
-                --parameters OpenSearchDomainName="<i>your-opensearch-domain-name</i>"
+  (.venv) $ cdk deploy OpenSearchStack
   </pre>
 
 ## Create Amazon Kinesis Data Firehose
 
   <pre>
-  (.venv) $ cdk deploy \
-                -c vpc_name='<i>your-existing-vpc-name</i>' \
-                -e FirehoseStack \
-                --parameters SearchIndexName="<i>your-opensearch-index-name</i>"
+  (.venv) $ cdk deploy FirehoseStack
   </pre>
 
 ## Remotely access your Amazon OpenSearch Cluster using SSH tunnel from local machine

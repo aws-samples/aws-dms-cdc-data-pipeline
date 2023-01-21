@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import random
+import string
 
 import aws_cdk as cdk
 
@@ -9,21 +11,20 @@ from aws_cdk import (
 )
 from constructs import Construct
 
+random.seed(37)
+
 class KinesisDataStreamStack(Stack):
 
   def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
     super().__init__(scope, construct_id, **kwargs)
 
-    kinesis_stream_name = cdk.CfnParameter(self, 'TargetKinesisStreamName',
-      type='String',
-      description='DMS Target Kinesis Data Streams name',
-      default='dms-cdc'
-    )
+    KINESIS_DEFAULT_STREAM_NAME = 'PUT-{}'.format(''.join(random.sample((string.ascii_letters), k=5)))
+    kinesis_stream_name = self.node.try_get_context('kinesis_stream_name') or KINESIS_DEFAULT_STREAM_NAME
 
     kinesis_stream = aws_kinesis.Stream(self, 'DMSTargetKinesisStream',
       retention_period=Duration.hours(24),
       stream_mode=aws_kinesis.StreamMode.ON_DEMAND,
-      stream_name=kinesis_stream_name.value_as_string
+      stream_name=kinesis_stream_name
     )
 
     self.kinesis_stream_name = kinesis_stream.stream_name

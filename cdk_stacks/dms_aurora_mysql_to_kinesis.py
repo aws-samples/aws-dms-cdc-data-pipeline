@@ -18,15 +18,9 @@ class DMSAuroraMysqlToKinesisStack(Stack):
   def __init__(self, scope: Construct, construct_id: str, vpc, db_client_sg, target_kinesis_stream_arn, **kwargs) -> None:
     super().__init__(scope, construct_id, **kwargs)
 
-    database_name = cdk.CfnParameter(self, 'SourceDatabaseName',
-      type='String',
-      description='DMS Source Database name'
-    )
-
-    table_name = cdk.CfnParameter(self, 'SourceTableName',
-      type='String',
-      description='DMS Source Table name'
-    )
+    dms_data_source = self.node.try_get_context('dms_data_source')
+    database_name = dms_data_source['database_name']
+    table_name = dms_data_source['table_name']
 
     dms_replication_subnet_group = aws_dms.CfnReplicationSubnetGroup(self, 'DMSReplicationSubnetGroup',
       replication_subnet_group_description='DMS Replication Subnet Group',
@@ -104,8 +98,8 @@ class DMSAuroraMysqlToKinesisStack(Stack):
           "rule-id": "1",
           "rule-name": "1",
           "object-locator": {
-            "schema-name": database_name.value_as_string,
-            "table-name": table_name.value_as_string
+            "schema-name": database_name,
+            "table-name": table_name
           },
           "rule-action": "include",
           "filters": []
@@ -116,8 +110,8 @@ class DMSAuroraMysqlToKinesisStack(Stack):
           "rule-name": "DefaultMapToKinesis",
           "rule-action": "map-record-to-record",
           "object-locator": {
-            "schema-name": database_name.value_as_string,
-            "table-name": table_name.value_as_string
+            "schema-name": database_name,
+            "table-name": table_name
           }
         }
       ]
