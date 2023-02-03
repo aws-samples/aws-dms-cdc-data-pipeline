@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-import random
 import re
-import string
 
 import aws_cdk as cdk
 
@@ -15,7 +13,7 @@ from aws_cdk import (
 )
 from constructs import Construct
 
-random.seed(47)
+# random.seed(47)
 
 
 class KinesisFirehoseStack(Stack):
@@ -28,11 +26,10 @@ class KinesisFirehoseStack(Stack):
     OPENSEARCH_INDEX_NAME = self.node.try_get_context('opensearch_index_name')
     assert re.fullmatch(r'[a-z][a-z0-9\-_]+', OPENSEARCH_INDEX_NAME), 'Invalid domain name'
 
-    S3_BUCKET_SUFFIX = ''.join(random.sample((string.ascii_lowercase + string.digits), k=7))
     s3_bucket = s3.Bucket(self, "s3bucket",
       removal_policy=cdk.RemovalPolicy.DESTROY, #XXX: Default: core.RemovalPolicy.RETAIN - The bucket will be orphaned
       bucket_name="firehose-to-ops-{region}-{suffix}".format(
-        region=cdk.Aws.REGION, suffix=S3_BUCKET_SUFFIX))
+        region=cdk.Aws.REGION, suffix=cdk.Aws.ACCOUNT_ID))
 
     firehose_role_policy_doc = aws_iam.PolicyDocument()
     firehose_role_policy_doc.add_statements(aws_iam.PolicyStatement(**{

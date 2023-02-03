@@ -15,16 +15,19 @@ from cdk_stacks import (
   KinesisFirehoseStack
 )
 
+APP_ENV = cdk.Environment(
+  account=os.environ["CDK_DEFAULT_ACCOUNT"],
+  region=os.environ["CDK_DEFAULT_REGION"]
+)
 
 app = cdk.App()
 
 vpc_stack = VpcStack(app, 'VpcStack',
-  env=cdk.Environment(
-    account=os.environ["CDK_DEFAULT_ACCOUNT"],
-    region=os.environ["CDK_DEFAULT_REGION"]))
+  env=APP_ENV)
 
 aurora_mysql_stack = AuroraMysqlStack(app, 'AuroraMysqlStack',
-  vpc_stack.vpc
+  vpc_stack.vpc,
+  env=APP_ENV
 )
 aurora_mysql_stack.add_dependency(vpc_stack)
 
@@ -34,12 +37,14 @@ kds_stack.add_dependency(aurora_mysql_stack)
 dms_stack = DMSAuroraMysqlToKinesisStack(app, 'DMSAuroraMysqlToKinesisStack',
   vpc_stack.vpc,
   aurora_mysql_stack.sg_mysql_client,
-  kds_stack.kinesis_stream_arn
+  kds_stack.kinesis_stream_arn,
+  env=APP_ENV
 )
 dms_stack.add_dependency(kds_stack)
 
 ops_stack = OpenSearchStack(app, 'OpenSearchStack',
-  vpc_stack.vpc
+  vpc_stack.vpc,
+  env=APP_ENV
 )
 ops_stack.add_dependency(dms_stack)
 
@@ -47,7 +52,8 @@ firehose_stack = KinesisFirehoseStack(app, 'FirehoseStack',
   vpc_stack.vpc,
   kds_stack.kinesis_stream_arn,
   ops_stack.ops_domain_arn,
-  ops_stack.ops_client_sg_id
+  ops_stack.ops_client_sg_id,
+  env=APP_ENV
 )
 firehose_stack.add_dependency(ops_stack)
 
