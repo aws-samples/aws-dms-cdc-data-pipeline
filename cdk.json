@@ -25,6 +25,7 @@
     "@aws-cdk/core:target-partitions": [
       "aws",
       "aws-cn"
-    ]
+    ],
+    "@aws-cdk/customresources:installLatestAwsSdkDefault": false
   }
 }
