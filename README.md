@@ -156,16 +156,16 @@ Now you can now synthesize the CloudFormation template for this code.
 2. Also run this to create the sample table named `retail_trans`
    <pre>
     MySQL [testdb]> CREATE TABLE IF NOT EXISTS testdb.retail_trans (
-        ->   trans_id BIGINT(20) AUTO_INCREMENT,
-        ->   customer_id VARCHAR(12) NOT NULL,
-        ->   event VARCHAR(10) DEFAULT NULL,
-        ->   sku VARCHAR(10) NOT NULL,
-        ->   amount INT DEFAULT 0,
-        ->   device VARCHAR(10) DEFAULT NULL,
-        ->   trans_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
-        ->   PRIMARY KEY(trans_id),
-        ->   KEY(trans_datetime)
-        -> ) ENGINE=InnoDB AUTO_INCREMENT=0;
+             trans_id BIGINT(20) AUTO_INCREMENT,
+             customer_id VARCHAR(12) NOT NULL,
+             event VARCHAR(10) DEFAULT NULL,
+             sku VARCHAR(10) NOT NULL,
+             amount INT DEFAULT 0,
+             device VARCHAR(10) DEFAULT NULL,
+             trans_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
+             PRIMARY KEY(trans_id),
+             KEY(trans_datetime)
+           ) ENGINE=InnoDB AUTO_INCREMENT=0;
     Query OK, 0 rows affected, 1 warning (0.04 sec)
 
     MySQL [testdb]> SHOW TABLES;
