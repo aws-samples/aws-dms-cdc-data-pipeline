@@ -26,7 +26,7 @@ class BastionHostEC2InstanceStack(Stack):
       vpc=vpc,
       allow_all_outbound=True,
       description='security group for an bastion host',
-      # security_group_name='bastion-host-sg'
+      security_group_name='bastion-host-sg'
     )
     cdk.Tags.of(sg_bastion_host).add('Name', 'bastion-host-sg')
 
@@ -56,18 +56,9 @@ class BastionHostEC2InstanceStack(Stack):
     #XXX: https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_ec2/InstanceSize.html#aws_cdk.aws_ec2.InstanceSize
     ec2_instance_type = aws_ec2.InstanceType.of(aws_ec2.InstanceClass.BURSTABLE3, aws_ec2.InstanceSize.MEDIUM)
 
-    # bastion_host = aws_ec2.Instance(self, "BastionHost",
-    #   vpc=vpc,
-    #   instance_type=ec2_instance_type,
-    #   machine_image=aws_ec2.MachineImage.latest_amazon_linux(),
-    #   vpc_subnets=aws_ec2.SubnetSelection(subnet_type=aws_ec2.SubnetType.PUBLIC),
-    #   security_group=sg_bastion_host,
-    #   key_name=ec2_key_pair_name
-    # )
     bastion_host = aws_ec2.Instance(self, 'BastionHostEC2Instance',
       instance_type=ec2_instance_type,
       machine_image=amzn_linux,
-      # availability_zone=vpc.select_subnets(subnet_type=aws_ec2.SubnetType.PRIVATE_WITH_EGRESS).availability_zones[0],
       instance_name=f'{self.stack_name}/BastionHost',
       role=bastion_host_role,
       security_group=sg_bastion_host,
