@@ -12,7 +12,8 @@ from cdk_stacks import (
   KinesisDataStreamStack,
   DMSAuroraMysqlToKinesisStack,
   OpenSearchStack,
-  KinesisFirehoseStack
+  KinesisFirehoseStack,
+  BastionHostEC2InstanceStack,
 )
 
 APP_ENV = cdk.Environment(
@@ -31,8 +32,15 @@ aurora_mysql_stack = AuroraMysqlStack(app, 'AuroraMysqlStack',
 )
 aurora_mysql_stack.add_dependency(vpc_stack)
 
+bastion_host = BastionHostEC2InstanceStack(app, 'AuroraMysqlBastionHost',
+  vpc_stack.vpc,
+  aurora_mysql_stack.sg_mysql_client,
+  env=APP_ENV
+)
+bastion_host.add_dependency(aurora_mysql_stack)
+
 kds_stack = KinesisDataStreamStack(app, 'DMSTargetKinesisDataStreamStack')
-kds_stack.add_dependency(aurora_mysql_stack)
+kds_stack.add_dependency(bastion_host)
 
 dms_stack = DMSAuroraMysqlToKinesisStack(app, 'DMSAuroraMysqlToKinesisStack',
   vpc_stack.vpc,
@@ -44,6 +52,7 @@ dms_stack.add_dependency(kds_stack)
 
 ops_stack = OpenSearchStack(app, 'OpenSearchStack',
   vpc_stack.vpc,
+  bastion_host.sg_bastion_host,
   env=APP_ENV
 )
 ops_stack.add_dependency(dms_stack)

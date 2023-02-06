@@ -92,7 +92,7 @@ def main():
     sql_stmt = INSERT_SQL_FMT.format(database=options.database, table=options.table, **json_record)
 
     if options.dry_run:
-      print(record, file=sys.stderr)
+      print(sql_stmt, file=sys.stderr)
     else:
       db.query(sql_stmt)
 

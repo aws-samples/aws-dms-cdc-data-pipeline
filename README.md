@@ -95,11 +95,13 @@ Now you can now synthesize the CloudFormation template for this code.
 
 ## Confirm that binary logging is enabled
 
-<b><em>In order to set up the Aurora MySQL, you need to connect the Aurora MySQL cluster on either your local PC or a EC2 instance.</em></b>
+<b><em>In order to set up the Aurora MySQL, you need to connect the Aurora MySQL cluster on an EC2 Bastion host.</em></b>
 
 1. Connect to the Aurora cluster writer node.
    <pre>
-    $ mysql -h<i>db-cluster-name</i>.cluster-<i>xxxxxxxxxxxx</i>.<i>region-name</i>.rds.amazonaws.com -uadmin -p
+    $ BASTION_HOST_ID=$(aws cloudformation describe-stacks --stack-name <i>AuroraMysqlBastionHost</i> | jq -r '.Stacks[0].Outputs | .[] | select(.OutputKey | endswith("EC2InstanceId")) |.OutputValue')
+    $ ssh -i <i>/path/to/ec2_key_pair_name.pem</i> ec2-user@${BASTION_HOST_ID}
+    [ec2-user@ip-172-31-7-186 ~]$ mysql -h<i>db-cluster-name</i>.cluster-<i>xxxxxxxxxxxx</i>.<i>region-name</i>.rds.amazonaws.com -uadmin -p
     Enter password: 
     Welcome to the MariaDB monitor.  Commands end with ; or \g.
     Your MySQL connection id is 20
@@ -111,6 +113,11 @@ Now you can now synthesize the CloudFormation template for this code.
 
     MySQL [(none)]>
    </pre>
+
+   > :information_source: `AuroraMysqlBastionHost` is a CDK Stack to create the bastion host.
+
+   > :information_source: You can also connect to an EC2 instance using the EC2 Instance Connect CLI.
+   For more information, see [Connect using the EC2 Instance Connect CLI](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-methods.html#ec2-instance-connect-connecting-ec2-cli)
 
 2. At SQL prompt run the below command to confirm that binary logging is enabled:
    <pre>
@@ -254,7 +261,7 @@ Now you can now synthesize the CloudFormation template for this code.
     You can find the bastion host's public ip address as running the commands like this:
 
     <pre>
-    $ BASTION_HOST_ID=$(aws cloudformation describe-stacks --stack-name <i>your-cloudformation-stack-name</i> | jq -r '.Stacks[0].Outputs | map(select(.OutputKey == "BastionHostBastionHostId")) | .[0].OutputValue')
+    $ BASTION_HOST_ID=$(aws cloudformation describe-stacks --stack-name AuroraMysqlBastionHost | jq -r '.Stacks[0].Outputs | .[] | select(.OutputKey | endswith("EC2InstanceId")) |.OutputValue')
     $ aws ec2 describe-instances --instance-ids ${BASTION_HOST_ID} | jq -r '.Reservations[0].Instances[0].PublicIpAddress'
     </pre>
 
@@ -320,8 +327,16 @@ In the next step, you map the IAM role that Kinesis Data Firehose uses to the ro
 
 2. Generate test data.
    <pre>
-   (.venv) $ pip install -r utils/requirements-dev.txt
-   (.venv) $ python utils/gen_fake_mysql_data.py \
+    $ BASTION_HOST_ID=$(aws cloudformation describe-stacks --stack-name <i>AuroraMysqlBastionHost</i> | jq -r '.Stacks[0].Outputs | .[] | select(.OutputKey | endswith("EC2InstanceId")) |.OutputValue')
+    $ ssh -i <i>/path/to/ec2_key_pair_name.pem</i> ec2-user@${BASTION_HOST_ID}
+    [ec2-user@ip-172-31-7-186 ~]$ cat <<EOF >requirements-dev.txt
+    > boto3
+    > dataset==1.5.2
+    > Faker==13.3.1
+    > PyMySQL==1.0.2
+    > EOF
+    [ec2-user@ip-172-31-7-186 ~]$ pip install -r requirements-dev.txt
+    [ec2-user@ip-172-31-7-186 ~]$ python utils/gen_fake_mysql_data.py \
                    --database <i>your-database-name</i> \
                    --table <i>your-table-name</i> \
                    --user <i>user-name</i> \
@@ -408,6 +423,11 @@ Enjoy!
  * [Use an SSH Tunnel to access Kibana within an AWS VPC with PuTTy on Windows](https://amazonmsk-labs.workshop.aws/en/mskkdaflinklab/createesdashboard.html)
  * [OpenSearch Popular APIs](https://opensearch.org/docs/latest/opensearch/popular-api/)
  * [Using Data Viewer in the Kinesis Console](https://docs.aws.amazon.com/streams/latest/dev/data-viewer.html)
+ * [Connect using the EC2 Instance Connect CLI](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-methods.html#ec2-instance-connect-connecting-ec2-cli)
+   <pre>
+   $ sudo pip install ec2instanceconnectcli
+   $ mssh ec2-user@i-001234a4bf70dec41EXAMPLE # ec2-instance-id
+   </pre>
 
 ## Security
 
