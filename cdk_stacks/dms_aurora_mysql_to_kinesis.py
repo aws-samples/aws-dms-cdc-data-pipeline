@@ -46,13 +46,13 @@ class DMSAuroraMysqlToKinesisStack(Stack):
     secret_value = sm_client.get_secret_value(SecretId=secret_name)
     secret = json.loads(secret_value['SecretString'])
 
-    source_endpoint_id = secret['dbClusterIdentifier'].lower()
+    source_endpoint_id = secret.get('dbClusterIdentifier', '').lower()
     dms_source_endpoint = aws_dms.CfnEndpoint(self, 'DMSSourceEndpoint',
       endpoint_identifier=source_endpoint_id,
       endpoint_type='source',
-      engine_name=secret.get('engine'),
+      engine_name=secret.get('engine', 'mysql'),
       server_name=secret.get('host'),
-      port=int(secret.get('port')),
+      port=int(secret.get('port', 3306)),
       database_name=secret.get('dbname'),
       username=secret.get('username'),
       password=secret.get('password')

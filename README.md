@@ -54,7 +54,6 @@ Before synthesizing the CloudFormation, you should set approperly the cdk contex
 For example:
 <pre>
 {
-  "vpc_name": "<i>your-existing-vpc-name</i>",
   "db_cluster_name": "<i>db-cluster-name</i>",
   "db_secret_name": "<i>your-db-secret-name</i>",
   "dms_data_source": {
