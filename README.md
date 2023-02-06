@@ -90,7 +90,7 @@ Now you can now synthesize the CloudFormation template for this code.
 
 2. Create an Aurora MySQL Cluster
    <pre>
-   (.venv) $ cdk deploy VpcStack AuroraMysqlStack
+   (.venv) $ cdk deploy VpcStack AuroraMysqlStack AuroraMysqlBastionHost
    </pre>
 
 ## Confirm that binary logging is enabled
@@ -341,7 +341,7 @@ In the next step, you map the IAM role that Kinesis Data Firehose uses to the ro
     > PyMySQL==1.0.2
     > EOF
     [ec2-user@ip-172-31-7-186 ~]$ pip install -r requirements-dev.txt
-    [ec2-user@ip-172-31-7-186 ~]$ python utils/gen_fake_mysql_data.py \
+    [ec2-user@ip-172-31-7-186 ~]$ python3 utils/gen_fake_mysql_data.py \
                    --database <i>your-database-name</i> \
                    --table <i>your-table-name</i> \
                    --user <i>user-name</i> \

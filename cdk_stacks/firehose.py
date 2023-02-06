@@ -165,6 +165,6 @@ class KinesisFirehoseStack(Stack):
       tags=[{"key": "Name", "value": OPENSEARCH_INDEX_NAME}]
     )
 
-    cdk.CfnOutput(self, '{}_S3DestBucket'.format(self.stack_name), value=s3_bucket.bucket_name, export_name='S3DestBucket')
-    cdk.CfnOutput(self, 'FirehoseRoleArn', value=firehose_role.role_arn, export_name='FirehoseRoleArn')
+    cdk.CfnOutput(self, f'{self.stack_name}_S3DestBucket', value=s3_bucket.bucket_name, export_name=f'{self.stack_name}-S3DestBucket')
+    cdk.CfnOutput(self, 'FirehoseRoleArn', value=firehose_role.role_arn, export_name=f'{self.stack_name}-FirehoseRoleArn')
 
