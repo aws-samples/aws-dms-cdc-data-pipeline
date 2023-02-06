@@ -117,7 +117,12 @@ Now you can now synthesize the CloudFormation template for this code.
    > :information_source: `AuroraMysqlBastionHost` is a CDK Stack to create the bastion host.
 
    > :information_source: You can also connect to an EC2 instance using the EC2 Instance Connect CLI.
-   For more information, see [Connect using the EC2 Instance Connect CLI](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-methods.html#ec2-instance-connect-connecting-ec2-cli)
+   For more information, see [Connect using the EC2 Instance Connect CLI](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-methods.html#ec2-instance-connect-connecting-ec2-cli).
+   For example,
+       <pre>
+       $ sudo pip install ec2instanceconnectcli
+       $ mssh ec2-user@i-001234a4bf70dec41EXAMPLE # ec2-instance-id
+       </pre>
 
 2. At SQL prompt run the below command to confirm that binary logging is enabled:
    <pre>
