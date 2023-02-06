@@ -99,10 +99,10 @@ Now you can now synthesize the CloudFormation template for this code.
 
 1. Connect to the Aurora cluster writer node.
    <pre>
-    $ BASTION_HOST_ID=$(aws cloudformation describe-stacks --stack-name <i>AuroraMysqlBastionHost</i> | jq -r '.Stacks[0].Outputs | .[] | select(.OutputKey | endswith("EC2InstanceId")) |.OutputValue')
+    $ BASTION_HOST_ID=$(aws cloudformation describe-stacks --stack-name <i>AuroraMysqlBastionHost</i> | jq -r '.Stacks[0].Outputs | .[] | select(.OutputKey | endswith("EC2InstanceId")) | .OutputValue')
     $ ssh -i <i>/path/to/ec2_key_pair_name.pem</i> ec2-user@${BASTION_HOST_ID}
     [ec2-user@ip-172-31-7-186 ~]$ mysql -h<i>db-cluster-name</i>.cluster-<i>xxxxxxxxxxxx</i>.<i>region-name</i>.rds.amazonaws.com -uadmin -p
-    Enter password: 
+    Enter password:
     Welcome to the MariaDB monitor.  Commands end with ; or \g.
     Your MySQL connection id is 20
     Server version: 8.0.23 Source distribution
@@ -334,7 +334,7 @@ In the next step, you map the IAM role that Kinesis Data Firehose uses to the ro
    <pre>
     $ BASTION_HOST_ID=$(aws cloudformation describe-stacks --stack-name <i>AuroraMysqlBastionHost</i> | jq -r '.Stacks[0].Outputs | .[] | select(.OutputKey | endswith("EC2InstanceId")) |.OutputValue')
     $ ssh -i <i>/path/to/ec2_key_pair_name.pem</i> ec2-user@${BASTION_HOST_ID}
-    [ec2-user@ip-172-31-7-186 ~]$ cat <<EOF >requirements-dev.txt
+    [ec2-user@ip-172-31-7-186 ~]$ cat <&ltEOF >requirements-dev.txt
     > boto3
     > dataset==1.5.2
     > Faker==13.3.1
