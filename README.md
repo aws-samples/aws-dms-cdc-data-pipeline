@@ -215,7 +215,7 @@ Now you can now synthesize the CloudFormation template for this code.
 ## Create AWS DMS Replication Task
   In the previous step we already created the sample database (i.e. `testdb`) and table (`retail_trans`).
 
-  Now let create a migration task.
+  Now let's create a migration task.
   <pre>
   (.venv) $ cdk deploy DMSAuroraMysqlToKinesisStack
   </pre>
