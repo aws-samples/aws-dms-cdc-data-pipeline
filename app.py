@@ -10,6 +10,7 @@ from cdk_stacks import (
   VpcStack,
   AuroraMysqlStack,
   KinesisDataStreamStack,
+  DmsIAMRolesStack,
   DMSAuroraMysqlToKinesisStack,
   OpenSearchStack,
   KinesisFirehoseStack,
@@ -42,13 +43,16 @@ bastion_host.add_dependency(aurora_mysql_stack)
 kds_stack = KinesisDataStreamStack(app, 'DMSTargetKinesisDataStreamStack')
 kds_stack.add_dependency(bastion_host)
 
+dms_iam_permissions = DmsIAMRolesStack(app, 'DMSRequiredIAMRolesStack')
+dms_iam_permissions.add_dependency(kds_stack)
+
 dms_stack = DMSAuroraMysqlToKinesisStack(app, 'DMSAuroraMysqlToKinesisStack',
   vpc_stack.vpc,
   aurora_mysql_stack.sg_mysql_client,
   kds_stack.kinesis_stream_arn,
   env=APP_ENV
 )
-dms_stack.add_dependency(kds_stack)
+dms_stack.add_dependency(dms_iam_permissions)
 
 ops_stack = OpenSearchStack(app, 'OpenSearchStack',
   vpc_stack.vpc,

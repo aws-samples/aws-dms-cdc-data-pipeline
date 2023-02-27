@@ -217,7 +217,7 @@ Now you can now synthesize the CloudFormation template for this code.
 
   Now let's create a migration task.
   <pre>
-  (.venv) $ cdk deploy DMSAuroraMysqlToKinesisStack
+  (.venv) $ cdk deploy DMSRequiredIAMRolesStack DMSAuroraMysqlToKinesisStack
   </pre>
 
 ## Create Amazon OpenSearch Service
