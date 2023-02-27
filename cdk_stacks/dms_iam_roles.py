@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
-import json
-
 import boto3
-import botocore
 
 import aws_cdk as cdk
 
