@@ -46,6 +46,7 @@ dms_iam_permissions.add_dependency(kds_stack)
 dms_stack = DMSAuroraMysqlToKinesisStack(app, 'DMSAuroraMysqlToKinesisStack',
   vpc_stack.vpc,
   aurora_mysql_stack.sg_mysql_client,
+  aurora_mysql_stack.db_hostname,
   kds_stack.kinesis_stream_arn,
   env=APP_ENV
 )

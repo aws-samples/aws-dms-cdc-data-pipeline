@@ -9,22 +9,24 @@ import aws_cdk as cdk
 from aws_cdk import (
   Stack,
   aws_dms,
+  aws_ec2,
   aws_iam
 )
 from constructs import Construct
 
 class DMSAuroraMysqlToKinesisStack(Stack):
 
-  def __init__(self, scope: Construct, construct_id: str, vpc, db_client_sg, target_kinesis_stream_arn, **kwargs) -> None:
+  def __init__(self, scope: Construct, construct_id: str, vpc, db_client_sg, source_database_hostname, target_kinesis_stream_arn, **kwargs) -> None:
     super().__init__(scope, construct_id, **kwargs)
 
+    db_cluster_name = self.node.try_get_context('db_cluster_name')
     dms_data_source = self.node.try_get_context('dms_data_source')
     database_name = dms_data_source['database_name']
     table_name = dms_data_source['table_name']
 
     dms_replication_subnet_group = aws_dms.CfnReplicationSubnetGroup(self, 'DMSReplicationSubnetGroup',
       replication_subnet_group_description='DMS Replication Subnet Group',
-      subnet_ids=vpc.select_subnets().subnet_ids
+      subnet_ids=vpc.select_subnets(subnet_type=aws_ec2.SubnetType.PRIVATE_WITH_EGRESS).subnet_ids
     )
 
     dms_replication_instance = aws_dms.CfnReplicationInstance(self, 'DMSReplicationInstance',
@@ -37,7 +39,7 @@ class DMSAuroraMysqlToKinesisStack(Stack):
       multi_az=False,
       preferred_maintenance_window='sat:03:17-sat:03:47',
       publicly_accessible=False,
-      replication_subnet_group_identifier=dms_replication_subnet_group.replication_subnet_group_identifier,
+      replication_subnet_group_identifier=dms_replication_subnet_group.ref,
       vpc_security_group_ids=[db_client_sg.security_group_id]
     )
 
@@ -46,14 +48,14 @@ class DMSAuroraMysqlToKinesisStack(Stack):
     secret_value = sm_client.get_secret_value(SecretId=secret_name)
     secret = json.loads(secret_value['SecretString'])
 
-    source_endpoint_id = secret.get('dbClusterIdentifier', '').lower()
+    source_endpoint_id = secret.get('dbClusterIdentifier', db_cluster_name).lower()
     dms_source_endpoint = aws_dms.CfnEndpoint(self, 'DMSSourceEndpoint',
       endpoint_identifier=source_endpoint_id,
       endpoint_type='source',
       engine_name=secret.get('engine', 'mysql'),
-      server_name=secret.get('host'),
+      server_name=secret.get('host', source_database_hostname),
       port=int(secret.get('port', 3306)),
-      database_name=secret.get('dbname'),
+      database_name=secret.get('dbname', database_name),
       username=secret.get('username'),
       password=secret.get('password')
     )
@@ -88,7 +90,8 @@ class DMSAuroraMysqlToKinesisStack(Stack):
         # Link: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dms-endpoint-kinesissettings.html
         message_format="json-unformatted",
         service_access_role_arn=dms_target_kinesis_access_role.role_arn,
-        stream_arn=target_kinesis_stream_arn)
+        stream_arn=target_kinesis_stream_arn
+      )
     )
 
     table_mappings_json = {

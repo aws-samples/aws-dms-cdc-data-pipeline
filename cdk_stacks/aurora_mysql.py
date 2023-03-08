@@ -114,5 +114,8 @@ class AuroraMysqlStack(Stack):
       )
     )
 
+    self.db_hostname = db_cluster.cluster_endpoint.hostname
+
+    cdk.CfnOutput(self, 'DBClusterEndpointHostName', value=self.db_hostname, export_name='DBClusterEndpointHostName')
     cdk.CfnOutput(self, 'DBClusterEndpoint', value=db_cluster.cluster_endpoint.socket_address, export_name='DBClusterEndpoint')
     cdk.CfnOutput(self, 'DBClusterReadEndpoint', value=db_cluster.cluster_read_endpoint.socket_address, export_name='DBClusterReadEndpoint')
