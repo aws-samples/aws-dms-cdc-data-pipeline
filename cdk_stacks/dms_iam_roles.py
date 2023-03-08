@@ -30,6 +30,7 @@ class DmsIAMRolesStack(Stack):
       )
 
     try:
+      iam_client.get_role(RoleName='dms-cloudwatch-logs-role')
       dms_cloudwatch_logs_role = aws_iam.Role.from_role_name(self, 'DMSCloudWatchLogsRole', role_name='dms-cloudwatch-logs-role')
     except iam_client.exceptions.NoSuchEntityException as ex:
       dms_cloudwatch_logs_role = aws_iam.Role(self, 'DMSCloudWatchLogsRole',
