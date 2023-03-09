@@ -99,7 +99,7 @@ def main():
       if (cnt + 1) % 100 == 0:
         print(sql_stmt)
         print('[INFO] {} records are processed'.format(cnt+1), file=sys.stderr)
-    time.sleep(3)
+      time.sleep(3)
 
 
 if __name__ == '__main__':
