@@ -298,15 +298,17 @@ This section describes how to create roles and set permissions for Kinesis Data 
 
 Complete the following steps:
 
-1. Navigate to Kibana (you can find the URL on the Amazon OpenSearch Service console).
-2. Enter the master user and password that you set up when you created the Amazon OpenSearch Service endpoint.
-3. Under **Security**, choose **Roles**.
-4. Choose **Create role**.
-5. Name your role; for example, `firehose_role`.
-6. For cluster permissions, add `cluster_composite_ops` and `cluster_monitor`.
-7. Under **Index permissions**, choose **Index Patterns** and enter <i>index-name*</i>; for example, `retail-trans*`.
-8. Under **Permissions**, add three action groups: `crud`, `create_index`, and `manage`.
-9. Choose **Create**.
+1. Navigate to the OpenSearch Dashboards (you can find the URL on the Amazon OpenSearch Service console).
+2. Enter the master user and password that you set up when you created the Amazon OpenSearch Service endpoint. The user and password is stored in the [AWS Secrets Manager](https://console.aws.amazon.com/secretsmanager/listsecrets) as a name such as `OpenSearchMasterUserSecret1-xxxxxxxxxxxx`.
+3. In the Welcome screen, click the toolbar icon to the left side of **Home** button. Choose **Security**.
+   ![ops-dashboards-sidebar-menu-security](./assets/ops-dashboards-sidebar-menu-security.png)
+4. Under **Security**, choose **Roles**.
+5. Choose **Create role**.
+6. Name your role; for example, `firehose_role`.
+7. For cluster permissions, add `cluster_composite_ops` and `cluster_monitor`.
+8. Under **Index permissions**, choose **Index Patterns** and enter <i>index-name*</i>; for example, `retail-trans*`.
+9. Under **Permissions**, add three action groups: `crud`, `create_index`, and `manage`.
+10. Choose **Create**.
     ![ops-create-firehose_role](./assets/ops-create-firehose_role.png)
 
 In the next step, you map the IAM role that Kinesis Data Firehose uses to the role you just created.
