@@ -273,7 +273,7 @@ Now you can now synthesize the CloudFormation template for this code.
     </pre>
 
 2. Run `ssh -N opstunnel` in Terminal.
-3. Connect to `https://localhost:9200/_dashboards/` in a web browser.
+3. Connect to `https://localhost:9200/_dashboards/app/login?` in a web browser.
 4. Enter the master user and password that you set up when you created the Amazon OpenSearch Service endpoint. The user and password is stored in the [AWS Secrets Manager](https://console.aws.amazon.com/secretsmanager/listsecrets) as a name such as `OpenSearchMasterUserSecret1-xxxxxxxxxxxx`.
 5. In the Welcome screen, click the toolbar icon to the left side of **Home** button. Choose **Stack Managerment**
    ![ops-dashboards-sidebar-menu](./assets/ops-dashboards-sidebar-menu.png)
