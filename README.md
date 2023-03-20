@@ -298,7 +298,7 @@ This section describes how to create roles and set permissions for Kinesis Data 
 
 Complete the following steps:
 
-1. Navigate to the OpenSearch Dashboards (you can find the URL on the Amazon OpenSearch Service console).
+1. Navigate to the OpenSearch Dashboards (you can find the URL on the Amazon OpenSearch Service console) in a web browser.
 2. Enter the master user and password that you set up when you created the Amazon OpenSearch Service endpoint. The user and password is stored in the [AWS Secrets Manager](https://console.aws.amazon.com/secretsmanager/listsecrets) as a name such as `OpenSearchMasterUserSecret1-xxxxxxxxxxxx`.
 3. In the Welcome screen, click the toolbar icon to the left side of **Home** button. Choose **Security**.
    ![ops-dashboards-sidebar-menu-security](./assets/ops-dashboards-sidebar-menu-security.png)
