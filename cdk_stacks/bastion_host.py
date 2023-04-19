@@ -34,8 +34,8 @@ class BastionHostEC2InstanceStack(Stack):
     sg_bastion_host.add_ingress_rule(peer=aws_ec2.Peer.ipv4("0.0.0.0/0"),
       connection=aws_ec2.Port.tcp(22), description='SSH access')
 
-    bastion_host_role = aws_iam.Role(self, 'KafkaClientEC2InstanceRole',
-      role_name=f'KafkaClientEC2InstanceRole-{self.stack_name}',
+    bastion_host_role = aws_iam.Role(self, 'MySQLClientEC2InstanceRole',
+      role_name=f'MySQLClientEC2InstanceRole-{self.stack_name}',
       assumed_by=aws_iam.ServicePrincipal('ec2.amazonaws.com'),
       managed_policies=[
         aws_iam.ManagedPolicy.from_aws_managed_policy_name('AmazonSSMManagedInstanceCore'),
