@@ -201,7 +201,7 @@ Now you can now synthesize the CloudFormation template for this code.
     +----------------+-------------+------+-----+-------------------+-------------------+
     7 rows in set (0.00 sec)
 
-    MySQL [testdb]>    
+    MySQL [testdb]>
    </pre>
 
 <b><em>After setting up the Aurora MySQL, you should come back to the terminal where you are deploying stacks.</em></b>
@@ -274,7 +274,7 @@ Now you can now synthesize the CloudFormation template for this code.
 
 2. Run `ssh -N opstunnel` in Terminal.
 3. Connect to `https://localhost:9200/_dashboards/app/login?` in a web browser.
-4. Enter the master user and password that you set up when you created the Amazon OpenSearch Service endpoint. The user and password is stored in the [AWS Secrets Manager](https://console.aws.amazon.com/secretsmanager/listsecrets) as a name such as `OpenSearchMasterUserSecret1-xxxxxxxxxxxx`.
+4. Enter the master user and password that you set up when you created the Amazon OpenSearch Service endpoint. The user name and password of the master user are stored in the [AWS Secrets Manager](https://console.aws.amazon.com/secretsmanager/listsecrets) as a name such as `OpenSearchMasterUserSecret1-xxxxxxxxxxxx`.
 5. In the Welcome screen, click the toolbar icon to the left side of **Home** button. Choose **Stack Managerment**
    ![ops-dashboards-sidebar-menu](./assets/ops-dashboards-sidebar-menu.png)
 6. After selecting **Advanced Settings** from the left sidebar menu, set **Timezone** for date formatting to `Etc/UTC`.
