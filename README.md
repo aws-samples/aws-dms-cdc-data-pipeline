@@ -441,6 +441,13 @@ Enjoy!
    $ mssh ec2-user@i-001234a4bf70dec41EXAMPLE # ec2-instance-id
    </pre>
 
+## Related Works
+
+ * [aws-msk-serverless-cdc-data-pipeline-with-debezium](https://github.com/aws-samples/aws-msk-serverless-cdc-data-pipeline-with-debezium)
+   ![aws-msk-serverless-cdc-data-pipeline-arch](https://raw.githubusercontent.com/aws-samples/aws-msk-serverless-cdc-data-pipeline-with-debezium/main/aws-msk-connect-cdc-data-pipeline-arch.svg)
+ * [aws-msk-cdc-data-pipeline-with-debezium](https://github.com/aws-samples/aws-msk-cdc-data-pipeline-with-debezium)
+   ![aws-msk-cdc-data-pipeline-arch](https://raw.githubusercontent.com/aws-samples/aws-msk-cdc-data-pipeline-with-debezium/main/aws-msk-connect-cdc-data-pipeline-arch.svg)
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
