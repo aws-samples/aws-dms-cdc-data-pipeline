@@ -21,8 +21,11 @@ class BastionHostEC2InstanceStack(Stack):
     super().__init__(scope, construct_id, **kwargs)
 
     ec2_key_pair_name = self.node.try_get_context('ec2_key_pair_name')
+    ec2_key_pair = aws_ec2.KeyPair.from_key_pair_attributes(self, 'EC2KeyPair',
+      key_pair_name=ec2_key_pair_name
+    )
 
-    sg_bastion_host = aws_ec2.SecurityGroup(self, "BastionHostSG",
+    sg_bastion_host = aws_ec2.SecurityGroup(self, 'BastionHostSG',
       vpc=vpc,
       allow_all_outbound=True,
       description='security group for an bastion host',
@@ -44,25 +47,17 @@ class BastionHostEC2InstanceStack(Stack):
       ]
     )
 
-    amzn_linux = aws_ec2.MachineImage.latest_amazon_linux(
-      generation=aws_ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
-      edition=aws_ec2.AmazonLinuxEdition.STANDARD,
-      virtualization=aws_ec2.AmazonLinuxVirt.HVM,
-      storage=aws_ec2.AmazonLinuxStorage.GENERAL_PURPOSE,
-      cpu_type=aws_ec2.AmazonLinuxCpuType.X86_64
-    )
-
     #XXX: https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_ec2/InstanceClass.html
     #XXX: https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_ec2/InstanceSize.html#aws_cdk.aws_ec2.InstanceSize
     ec2_instance_type = aws_ec2.InstanceType.of(aws_ec2.InstanceClass.BURSTABLE3, aws_ec2.InstanceSize.MEDIUM)
 
     bastion_host = aws_ec2.Instance(self, 'BastionHostEC2Instance',
       instance_type=ec2_instance_type,
-      machine_image=amzn_linux,
+      machine_image=aws_ec2.MachineImage.latest_amazon_linux2(),
       instance_name=f'{self.stack_name}/BastionHost',
       role=bastion_host_role,
       security_group=sg_bastion_host,
-      key_name=ec2_key_pair_name,
+      key_pair=ec2_key_pair,
       vpc=vpc,
       vpc_subnets=aws_ec2.SubnetSelection(subnet_type=aws_ec2.SubnetType.PUBLIC),
     )
@@ -79,7 +74,7 @@ class BastionHostEC2InstanceStack(Stack):
     )
 
     commands = '''
-yum update -y 
+yum update -y
 yum install -y python3.7
 yum install -y jq
 yum install -y mysql

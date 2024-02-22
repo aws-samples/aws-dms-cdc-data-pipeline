@@ -47,7 +47,18 @@ To add additional dependencies, for example other CDK libraries, just add
 them to your `setup.py` file and rerun the `pip install -r requirements.txt`
 command.
 
-Before synthesizing the CloudFormation, you should set approperly the cdk context configuration file, `cdk.context.json`.
+## Prerequisites
+
+For this project, you must create a key pair for Amazon EC2 if you do not already have one by running the following commands:
+
+```bash
+$ aws ec2 create-key-pair --key-name my-ec2-key-pair --query 'KeyMaterial' --output text > my-ec2-key-pair.pem
+$ chmod 400 my-ec2-key-pair.pem
+```
+
+:information_source: For more information, see [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-services-ec2-keypairs.html).
+
+Then, before synthesizing the CloudFormation, you should set approperly the cdk context configuration file, `cdk.context.json`.
 
 For example:
 <pre>
@@ -67,7 +78,7 @@ For example:
 
 :warning: `ec2_key_pair_name` option should be entered without the `.pem` extension.
 
-Before any AWS CDK app can be deployed, you have to bootstrap your AWS environment to create certain AWS resources that the AWS CDK CLI (Command Line Interface) uses to deploy your AWS CDK app.
+Also, before any AWS CDK app can be deployed, you have to bootstrap your AWS environment to create certain AWS resources that the AWS CDK CLI (Command Line Interface) uses to deploy your AWS CDK app.
 
 Run the `cdk bootstrap` command to bootstrap the AWS environment.
 
@@ -105,8 +116,11 @@ Now you can synthesize the CloudFormation template for this code.
 
 1. Connect to the Aurora cluster writer node.
    <pre>
-    $ BASTION_HOST_ID=$(aws cloudformation describe-stacks --stack-name <i>AuroraMysqlBastionHost</i> | jq -r '.Stacks[0].Outputs | .[] | select(.OutputKey | endswith("EC2InstanceId")) | .OutputValue')
-    $ ssh -i <i>/path/to/ec2_key_pair_name.pem</i> ec2-user@${BASTION_HOST_ID}
+    $ BASTION_HOST_ID=$(aws cloudformation describe-stacks --stack-name <i>AuroraMysqlBastionHost</i> | \
+    jq -r '.Stacks[0].Outputs | .[] | select(.OutputKey | endswith("EC2InstanceId")) | .OutputValue')
+
+    $ aws ec2-instance-connect ssh --instance-id ${BASTION_HOST_ID} --os-user ec2-user
+
     [ec2-user@ip-172-31-7-186 ~]$ mysql -h<i>db-cluster-name</i>.cluster-<i>xxxxxxxxxxxx</i>.<i>region-name</i>.rds.amazonaws.com -uadmin -p
     Enter password:
     Welcome to the MariaDB monitor.  Commands end with ; or \g.
@@ -122,13 +136,9 @@ Now you can synthesize the CloudFormation template for this code.
 
    > :information_source: `AuroraMysqlBastionHost` is a CDK Stack to create the bastion host.
 
-   > :information_source: You can also connect to an EC2 instance using the EC2 Instance Connect CLI.
+   > :information_source: You can connect to an EC2 instance using the EC2 Instance Connect CLI: `aws ec2-instance-connect ssh`.
    For more information, see [Connect using the EC2 Instance Connect CLI](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-methods.html#ec2-instance-connect-connecting-ec2-cli).
-   For example,
-       <pre>
-       $ sudo pip install ec2instanceconnectcli
-       $ mssh ec2-user@i-001234a4bf70dec41EXAMPLE # ec2-instance-id
-       </pre>
+
 
 2. At SQL prompt run the below command to confirm that binary logging is enabled:
    <pre>
@@ -274,7 +284,9 @@ Now you can synthesize the CloudFormation template for this code.
     You can find the bastion host's public ip address as running the commands like this:
 
     <pre>
-    $ BASTION_HOST_ID=$(aws cloudformation describe-stacks --stack-name <i>AuroraMysqlBastionHost</i> | jq -r '.Stacks[0].Outputs | .[] | select(.OutputKey | endswith("EC2InstanceId")) | .OutputValue')
+    $ BASTION_HOST_ID=$(aws cloudformation describe-stacks --stack-name <i>AuroraMysqlBastionHost</i> \
+    | jq -r '.Stacks[0].Outputs | .[] | select(.OutputKey | endswith("EC2InstanceId")) | .OutputValue')
+
     $ aws ec2 describe-instances --instance-ids ${BASTION_HOST_ID} | jq -r '.Reservations[0].Instances[0].PublicIpAddress'
     </pre>
 
@@ -289,9 +301,15 @@ Now you can synthesize the CloudFormation template for this code.
 7. If you would like to access the OpenSearch Cluster in a termial, open another terminal window, and then run the following commands: (in here, <i>`your-cloudformation-stack-name`</i> is `OpensearchStack`)
 
     <pre>
-    $ MASTER_USER_SECRET_ID=$(aws cloudformation describe-stacks --stack-name <i>your-cloudformation-stack-name</i> | jq -r '.Stacks[0].Outputs | map(select(.OutputKey == "MasterUserSecretId")) | .[0].OutputValue')
-    $ export OPS_SECRETS=$(aws secretsmanager get-secret-value --secret-id ${MASTER_USER_SECRET_ID} | jq -r '.SecretString | fromjson | "\(.username):\(.password)"')
-    $ export OPS_DOMAIN=$(aws cloudformation describe-stacks --stack-name <i>your-cloudformation-stack-name</i> | jq -r '.Stacks[0].Outputs | map(select(.OutputKey == "OpenSearchDomainEndpoint")) | .[0].OutputValue')
+    $ MASTER_USER_SECRET_ID=$(aws cloudformation describe-stacks --stack-name <i>your-cloudformation-stack-name</i> \
+    | jq -r '.Stacks[0].Outputs | map(select(.OutputKey == "MasterUserSecretId")) | .[0].OutputValue')
+
+    $ export OPS_SECRETS=$(aws secretsmanager get-secret-value --secret-id ${MASTER_USER_SECRET_ID} \
+    | jq -r '.SecretString | fromjson | "\(.username):\(.password)"')
+
+    $ export OPS_DOMAIN=$(aws cloudformation describe-stacks --stack-name <i>your-cloudformation-stack-name</i> \
+    | jq -r '.Stacks[0].Outputs | map(select(.OutputKey == "OpenSearchDomainEndpoint")) | .[0].OutputValue')
+
     $ curl -XGET --insecure -u "${OPS_SECRETS}" https://localhost:9200/_cluster/health?pretty=true
     $ curl -XGET --insecure -u "${OPS_SECRETS}" https://localhost:9200/_cat/nodes?v
     $ curl -XGET --insecure -u "${OPS_SECRETS}" https://localhost:9200/_nodes/stats?pretty=true
@@ -342,8 +360,11 @@ In the next step, you map the IAM role that Kinesis Data Firehose uses to the ro
 
 2. Generate test data.
    <pre>
-    $ BASTION_HOST_ID=$(aws cloudformation describe-stacks --stack-name <i>AuroraMysqlBastionHost</i> | jq -r '.Stacks[0].Outputs | .[] | select(.OutputKey | endswith("EC2InstanceId")) |.OutputValue')
-    $ ssh -i <i>/path/to/ec2_key_pair_name.pem</i> ec2-user@${BASTION_HOST_ID}
+    $ BASTION_HOST_ID=$(aws cloudformation describe-stacks --stack-name <i>AuroraMysqlBastionHost</i> \
+    | jq -r '.Stacks[0].Outputs | .[] | select(.OutputKey | endswith("EC2InstanceId")) |.OutputValue')
+
+    $ aws ec2-instance-connect ssh --instance-id ${BASTION_HOST_ID} --os-user ec2-user
+
     [ec2-user@ip-172-31-7-186 ~]$ cat <&ltEOF >requirements-dev.txt
     > boto3
     > dataset==1.5.2
