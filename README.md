@@ -47,8 +47,6 @@ To add additional dependencies, for example other CDK libraries, just add
 them to your `setup.py` file and rerun the `pip install -r requirements.txt`
 command.
 
-
-
 Before synthesizing the CloudFormation, you should set approperly the cdk context configuration file, `cdk.context.json`.
 
 For example:
@@ -69,7 +67,15 @@ For example:
 
 :warning: `ec2_key_pair_name` option should be entered without the `.pem` extension.
 
-Now you can now synthesize the CloudFormation template for this code.
+Before any AWS CDK app can be deployed, you have to bootstrap your AWS environment to create certain AWS resources that the AWS CDK CLI (Command Line Interface) uses to deploy your AWS CDK app.
+
+Run the `cdk bootstrap` command to bootstrap the AWS environment.
+
+```
+(.venv) $ cdk bootstrap
+```
+
+Now you can synthesize the CloudFormation template for this code.
 
 ## Creating Aurora MySQL cluster
 
