@@ -49,14 +49,14 @@ command.
 
 ## Prerequisites
 
-For this project, you must create a key pair for Amazon EC2 if you do not already have one by running the following commands:
+For this project, you'll need to create a key pair for Amazon EC2 if you don't already have one.
 
-```bash
-$ aws ec2 create-key-pair --key-name my-ec2-key-pair --query 'KeyMaterial' --output text > my-ec2-key-pair.pem
-$ chmod 400 my-ec2-key-pair.pem
-```
+**To create a key pair using Amazon EC2**
+- Open the Amazon EC2 console at [https://console.aws.amazon.com/ec2/](https://console.aws.amazon.com/ec2/),
+- Follow the instructions below to create a key pair and save it to **your local PC**.
+  - [Create a key pair using Amazon EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html#having-ec2-create-your-key-pair)
 
-:information_source: For more information, see [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-services-ec2-keypairs.html).
+:warning: You will need to keep the Amazon EC2 key pair on **your local PC** to complete this project.
 
 Then, before synthesizing the CloudFormation, you should set approperly the cdk context configuration file, `cdk.context.json`.
 
