@@ -238,6 +238,44 @@ Now you can synthesize the CloudFormation template for this code.
 
 ## Create Amazon OpenSearch Service
 
+1. :warning: Create a Service-Linked Role for Amazon OpenSearch Service
+
+   If you do not already have a Service-Linked Role (SLR) for Amazon OpenSearch Service named `AWSServiceRoleForAmazonOpenSearchService`,
+   you will need to create one for this project.
+
+   Check to see if `AWSServiceRoleForAmazonOpenSearchService` exists by running the following command:
+
+   ```
+   aws iam get-role --role-name AWSServiceRoleForAmazonOpenSearchService
+   ```
+
+   If it does not exist, you will seea message like this:
+   ```
+   An error occurred (NoSuchEntity) when calling the GetRole operation: The role with name AWSServiceRoleForAmazonOpenSearchService cannot be found.
+   ```
+   If it does, we recommend that you create the required Service Link Role (`AWSServiceRoleForAmazonOpenSearchService`) using the AWS CLI:
+   ```
+   aws iam create-service-linked-role --aws-service-name opensearchservice.amazonaws.com
+   ```
+
+   Some cluster configurations (e.g VPC access) require the existence of the `AWSServiceRoleForAmazonOpenSearchService` Service-Linked Role.
+
+   When performing such operations via the AWS Console, this SLR is created automatically when needed.
+   However, this is not the behavior when using CloudFormation.
+   If an SLR(Service-Linked Role) is needed, but doesn’t exist, you will encounter a failure message simlar to:
+
+   <pre>
+   11:11:30 AM | CREATE_FAILED        | AWS::OpenSearchService::Domain      | OpenSearch587998CD
+   Resource handler returned message: "Invalid request provided: Before you can proceed, you must enable a service-linked role to give Amazon OpenSearch Service permissions to access your VPC. (Servi
+   ce: OpenSearch, Status Code: 400, Request ID: 8e9618af-1554-4605-93a2-8c4cc22e2412)" (RequestToken: ccad0316-8daa-5c2a-89a1-056e1e88f23a, HandlerErrorCode: InvalidRequest)
+   </pre>
+
+   To resolve this, you need to [create](https://docs.aws.amazon.com/IAM/latest/UserGuide/using-service-linked-roles.html#create-service-linked-role) the SLR as described above.
+
+   :information_source: For more information, see [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/slr.html).
+
+2. Create an Amazon OpenSearch Service domain
+
   <pre>
   (.venv) $ cdk deploy OpenSearchStack
   </pre>
