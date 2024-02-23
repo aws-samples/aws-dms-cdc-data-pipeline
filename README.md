@@ -58,6 +58,24 @@ For this project, you'll need to create a key pair for Amazon EC2 if you don't a
 
 :warning: You will need to keep the Amazon EC2 key pair on **your local PC** to complete this project.
 
+You'll also need to create Amazon Secrets that will be used for your RDS.
+
+**Create Amazon Secrets using AWS CLI**:
+ <pre>
+ (.venv) $ aws secretsmanager create-secret \
+    --name "<i>your_db_secret_name</i>" \
+    --description "<i>(Optional) description of the secret</i>" \
+    --secret-string '{"username": "admin", "password": "<i>password_of_at_last_8_characters</i>"}'
+ </pre>
+
+For example,
+ <pre>
+ (.venv) $ aws secretsmanager create-secret \
+    --name "workshop/rds/admin" \
+    --description "admin user for rds" \
+    --secret-string '{"username": "admin", "password": "<i>your admin password</i>"}'
+ </pre>
+
 Then, before synthesizing the CloudFormation, you should set approperly the cdk context configuration file, `cdk.context.json`.
 
 For example:
@@ -90,25 +108,9 @@ Now you can synthesize the CloudFormation template for this code.
 
 ## Creating Aurora MySQL cluster
 
-1. :information_source: Create an AWS Secret for your RDS Admin user like this:
-   <pre>
-   (.venv) $ aws secretsmanager create-secret \
-      --name "<i>your_db_secret_name</i>" \
-      --description "<i>(Optional) description of the secret</i>" \
-      --secret-string '{"username": "admin", "password": <i>"password_of_at_last_8_characters"</i>}'
-   </pre>
-   For example,
-   <pre>
-   (.venv) $ aws secretsmanager create-secret \
-      --name "dev/rds/admin" \
-      --description "admin user for rds" \
-      --secret-string '{"username": "admin", "password": <i>"your admin password"</i>}'
-   </pre>
-
-2. Create an Aurora MySQL Cluster
-   <pre>
-   (.venv) $ cdk deploy VpcStack AuroraMysqlStack AuroraMysqlBastionHost
-   </pre>
+  <pre>
+  (.venv) $ cdk deploy VpcStack AuroraMysqlStack AuroraMysqlBastionHost
+  </pre>
 
 ## Confirm that binary logging is enabled
 
