@@ -59,25 +59,6 @@ For this project, you'll need to create a key pair for Amazon EC2 if you don't a
 
 :warning: You will need to keep the Amazon EC2 key pair on **your local PC** to complete this project.
 
-**Create Amazon Secrets using AWS CLI**
-
-You'll also need to create Amazon Secrets that will be used for your RDS.
-
-<pre>
-(.venv) $ aws secretsmanager create-secret \
-  --name "<i>your_db_secret_name</i>" \
-  --description "<i>(Optional) description of the secret</i>" \
-  --secret-string '{"username": "admin", "password": "<i>password_of_at_last_8_characters</i>"}'
-</pre>
-
-For example,
-<pre>
-(.venv) $ aws secretsmanager create-secret \
-  --name "workshop/rds/admin" \
-  --description "admin user for rds" \
-  --secret-string '{"username": "admin", "password": "<i>your admin password</i>"}'
-</pre>
-
 **Set up `cdk.context.json`**
 
 Then, before synthesizing the CloudFormation, you should set approperly the cdk context configuration file, `cdk.context.json`.
@@ -86,7 +67,6 @@ For example,
 <pre>
 {
   "db_cluster_name": "<i>db-cluster-name</i>",
-  "db_secret_name": "<i>your-db-secret-name</i>",
   "dms_data_source": {
     "database_name": "<i>testdb</i>",
     "table_name": "<i>retail_trans</i>"
@@ -121,6 +101,17 @@ Now you can synthesize the CloudFormation template for this code.
 ## Confirm that binary logging is enabled
 
 <b><em>In order to set up the Aurora MySQL, you need to connect the Aurora MySQL cluster on an EC2 Bastion host.</em></b>
+
+:information_source: The Aurora MySQL `username` and `password` are stored in the [AWS Secrets Manager](https://console.aws.amazon.com/secretsmanager/listsecrets) as a name such as `DatabaseSecret-xxxxxxxxxxxx`.
+
+**To retrieve a secret (AWS console)**
+
+- (Step 1) Open the Secrets Manager console at [https://console.aws.amazon.com/secretsmanager/](https://console.aws.amazon.com/secretsmanager/).
+- (Step 2) In the list of secrets, choose the secret you want to retrieve.
+- (Step 3) In the **Secret value** section, choose **Retrieve secret value**.<br/>
+Secrets Manager displays the current version (`AWSCURRENT`) of the secret. To see [other versions](https://docs.aws.amazon.com/secretsmanager/latest/userguide/getting-started.html#term_version) of the secret, such as `AWSPREVIOUS` or custom labeled versions, use the [AWS CLI](https://docs.aws.amazon.com/secretsmanager/latest/userguide/retrieving-secrets.html#retrieving-secrets_cli).
+
+**To confirm that binary logging is enabled**
 
 1. Connect to the Aurora cluster writer node.
    <pre>

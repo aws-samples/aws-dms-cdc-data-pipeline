@@ -2,6 +2,8 @@
 # -*- encoding: utf-8 -*-
 # vim: tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
+import json
+
 import aws_cdk as cdk
 
 from aws_cdk import (
@@ -81,13 +83,19 @@ class AuroraMysqlStack(Stack):
     )
 
     db_cluster_name = self.node.try_get_context('db_cluster_name')
-    #XXX: aws_rds.Credentials.from_username(username, ...) can not be given user specific Secret name
-    # therefore, first create Secret and then use it to create database
-    db_secret_name = self.node.try_get_context('db_secret_name')
-    #XXX: arn:{partition}:{service}:{region}:{account}:{resource}{sep}}{resource-name}
-    db_secret_arn = 'arn:aws:secretsmanager:{region}:{account}:secret:{resource_name}'.format(
-      region=cdk.Aws.REGION, account=cdk.Aws.ACCOUNT_ID, resource_name=db_secret_name)
-    db_secret = aws_secretsmanager.Secret.from_secret_partial_arn(self, 'DBSecretFromArn', db_secret_arn)
+
+    #XXX: In order to exclude punctuations when generating a password
+    # use aws_secretsmanager.Secret instead of aws_rds.DatabaseSecret.
+    # Othwerise, an error occurred such as:
+    # "All characters of the desired type have been excluded"
+    db_secret = aws_secretsmanager.Secret(self, 'DatabaseSecret',
+      generate_secret_string=aws_secretsmanager.SecretStringGenerator(
+        secret_string_template=json.dumps({"username": "admin"}),
+        generate_string_key="password",
+        exclude_punctuation=True,
+        password_length=8
+      )
+    )
     rds_credentials = aws_rds.Credentials.from_secret(db_secret)
 
     db_cluster = aws_rds.DatabaseCluster(self, 'Database',
@@ -119,6 +127,7 @@ class AuroraMysqlStack(Stack):
     )
 
     self.db_hostname = db_cluster.cluster_endpoint.hostname
+    self.db_secret = db_cluster.secret
 
     cdk.CfnOutput(self, 'DBClusterEndpointHostName',
       value=self.db_hostname,
@@ -129,3 +138,6 @@ class AuroraMysqlStack(Stack):
     cdk.CfnOutput(self, 'DBClusterReadEndpoint',
       value=db_cluster.cluster_read_endpoint.socket_address,
       export_name='DBClusterReadEndpoint')
+    cdk.CfnOutput(self, 'DBSecretName',
+      value=db_cluster.secret.secret_name,
+      export_name='DBSecretName')

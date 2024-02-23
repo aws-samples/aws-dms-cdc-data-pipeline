@@ -2,8 +2,6 @@
 
 import json
 
-import boto3
-
 import aws_cdk as cdk
 
 from aws_cdk import (
@@ -16,7 +14,10 @@ from constructs import Construct
 
 class DMSAuroraMysqlToKinesisStack(Stack):
 
-  def __init__(self, scope: Construct, construct_id: str, vpc, db_client_sg, source_database_hostname, target_kinesis_stream_arn, **kwargs) -> None:
+  def __init__(self, scope: Construct, construct_id: str,
+              vpc, db_client_sg, db_secret, source_database_hostname, target_kinesis_stream_arn,
+              **kwargs) -> None:
+
     super().__init__(scope, construct_id, **kwargs)
 
     db_cluster_name = self.node.try_get_context('db_cluster_name')
@@ -43,11 +44,6 @@ class DMSAuroraMysqlToKinesisStack(Stack):
       vpc_security_group_ids=[db_client_sg.security_group_id]
     )
 
-    sm_client = boto3.client('secretsmanager', region_name=vpc.env.region)
-    secret_name = self.node.try_get_context('db_secret_name')
-    secret_value = sm_client.get_secret_value(SecretId=secret_name)
-    secret = json.loads(secret_value['SecretString'])
-
     source_endpoint_id = db_cluster_name
     dms_source_endpoint = aws_dms.CfnEndpoint(self, 'DMSSourceEndpoint',
       endpoint_identifier=source_endpoint_id,
@@ -56,8 +52,8 @@ class DMSAuroraMysqlToKinesisStack(Stack):
       server_name=source_database_hostname,
       port=3306,
       database_name=database_name,
-      username=secret.get('username'),
-      password=secret.get('password')
+      username=db_secret.secret_value_from_json("username").unsafe_unwrap(),
+      password=db_secret.secret_value_from_json("password").unsafe_unwrap()
     )
 
     dms_kinesis_access_role_policy_doc = aws_iam.PolicyDocument()
