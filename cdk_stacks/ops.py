@@ -119,8 +119,13 @@ class OpenSearchStack(Stack):
     cdk.Tags.of(opensearch_domain).add('Name', opensearch_domain_name)
     self.ops_domain_arn = opensearch_domain.domain_arn
 
-    # cdk.CfnOutput(self, 'BastionHostId', value=bastion_host.instance_id, export_name='BastionHostId')
-    cdk.CfnOutput(self, 'OpenSearchDomainEndpoint', value=opensearch_domain.domain_endpoint, export_name='OpenSearchDomainEndpoint')
-    cdk.CfnOutput(self, 'OpenSearchDashboardsURL', value=f"{opensearch_domain.domain_endpoint}/_dashboards/", export_name='OpenSearchDashboardsURL')
-    cdk.CfnOutput(self, 'MasterUserSecretId', value=master_user_secret.secret_name, export_name='MasterUserSecretId')
+    cdk.CfnOutput(self, 'OpenSearchDomainEndpoint',
+      value=opensearch_domain.domain_endpoint,
+      export_name='OpenSearchDomainEndpoint')
+    cdk.CfnOutput(self, 'OpenSearchDashboardsURL',
+      value=f"{opensearch_domain.domain_endpoint}/_dashboards/",
+      export_name='OpenSearchDashboardsURL')
+    cdk.CfnOutput(self, 'MasterUserSecretId',
+      value=master_user_secret.secret_name,
+      export_name='MasterUserSecretId')
 
