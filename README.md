@@ -61,7 +61,7 @@ For this project, you'll need to create a key pair for Amazon EC2 if you don't a
 
 **Set up `cdk.context.json`**
 
-Then, before synthesizing the CloudFormation, you should set approperly the cdk context configuration file, `cdk.context.json`.
+Then, before deploying the CloudFormation, you should set approperly the cdk context configuration file, `cdk.context.json`.
 
 For example,
 <pre>
@@ -90,7 +90,7 @@ Run the `cdk bootstrap` command to bootstrap the AWS environment.
 (.venv) $ cdk bootstrap
 ```
 
-Now you can synthesize the CloudFormation template for this code.
+Now you can deploy the CloudFormation template for this code.
 
 ## Creating Aurora MySQL cluster
 
