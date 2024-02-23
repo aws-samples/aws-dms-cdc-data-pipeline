@@ -49,36 +49,40 @@ command.
 
 ## Prerequisites
 
+**Create a key pair using Amazon EC2**
+
 For this project, you'll need to create a key pair for Amazon EC2 if you don't already have one.
 
-**To create a key pair using Amazon EC2**
 - Open the Amazon EC2 console at [https://console.aws.amazon.com/ec2/](https://console.aws.amazon.com/ec2/),
 - Follow the instructions below to create a key pair and save it to **your local PC**.
   - [Create a key pair using Amazon EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html#having-ec2-create-your-key-pair)
 
 :warning: You will need to keep the Amazon EC2 key pair on **your local PC** to complete this project.
 
+**Create Amazon Secrets using AWS CLI**
+
 You'll also need to create Amazon Secrets that will be used for your RDS.
 
-**Create Amazon Secrets using AWS CLI**:
- <pre>
- (.venv) $ aws secretsmanager create-secret \
-    --name "<i>your_db_secret_name</i>" \
-    --description "<i>(Optional) description of the secret</i>" \
-    --secret-string '{"username": "admin", "password": "<i>password_of_at_last_8_characters</i>"}'
- </pre>
+<pre>
+(.venv) $ aws secretsmanager create-secret \
+  --name "<i>your_db_secret_name</i>" \
+  --description "<i>(Optional) description of the secret</i>" \
+  --secret-string '{"username": "admin", "password": "<i>password_of_at_last_8_characters</i>"}'
+</pre>
 
 For example,
- <pre>
- (.venv) $ aws secretsmanager create-secret \
-    --name "workshop/rds/admin" \
-    --description "admin user for rds" \
-    --secret-string '{"username": "admin", "password": "<i>your admin password</i>"}'
- </pre>
+<pre>
+(.venv) $ aws secretsmanager create-secret \
+  --name "workshop/rds/admin" \
+  --description "admin user for rds" \
+  --secret-string '{"username": "admin", "password": "<i>your admin password</i>"}'
+</pre>
+
+**Set up `cdk.context.json`**
 
 Then, before synthesizing the CloudFormation, you should set approperly the cdk context configuration file, `cdk.context.json`.
 
-For example:
+For example,
 <pre>
 {
   "db_cluster_name": "<i>db-cluster-name</i>",
@@ -95,6 +99,8 @@ For example:
 </pre>
 
 :warning: `ec2_key_pair_name` option should be entered without the `.pem` extension.
+
+**Bootstrap AWS environment for AWS CDK app**
 
 Also, before any AWS CDK app can be deployed, you have to bootstrap your AWS environment to create certain AWS resources that the AWS CDK CLI (Command Line Interface) uses to deploy your AWS CDK app.
 
