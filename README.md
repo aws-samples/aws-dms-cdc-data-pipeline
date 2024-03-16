@@ -106,7 +106,7 @@ OpenSearchStack
 FirehoseStack
 ```
 
-## Creating Aurora MySQL cluster
+## Create Aurora MySQL cluster
 
   <pre>
   (.venv) $ cdk deploy VpcStack AuroraMysqlStack AuroraMysqlBastionHost
