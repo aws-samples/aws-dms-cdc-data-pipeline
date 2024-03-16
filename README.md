@@ -92,6 +92,20 @@ Run the `cdk bootstrap` command to bootstrap the AWS environment.
 
 Now you can deploy the CloudFormation template for this code.
 
+## List all CDK Stacks
+
+```
+(.venv) $ cdk list
+VpcStack
+AuroraMysqlStack
+AuroraMysqlBastionHost
+DMSTargetKinesisDataStreamStack
+DMSRequiredIAMRolesStack
+DMSAuroraMysqlToKinesisStack
+OpenSearchStack
+FirehoseStack
+```
+
 ## Creating Aurora MySQL cluster
 
   <pre>
