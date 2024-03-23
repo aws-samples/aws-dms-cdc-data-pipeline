@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# -*- encoding: utf-8 -*-
+# vim: tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
 import re
 
@@ -12,8 +14,6 @@ from aws_cdk import (
   aws_kinesisfirehose
 )
 from constructs import Construct
-
-# random.seed(47)
 
 
 class KinesisFirehoseStack(Stack):
@@ -165,6 +165,6 @@ class KinesisFirehoseStack(Stack):
       tags=[{"key": "Name", "value": OPENSEARCH_INDEX_NAME}]
     )
 
-    cdk.CfnOutput(self, f'{self.stack_name}_S3DestBucket', value=s3_bucket.bucket_name, export_name=f'{self.stack_name}-S3DestBucket')
+    cdk.CfnOutput(self, 'FirehoseS3DestBucket', value=s3_bucket.bucket_name, export_name=f'{self.stack_name}-S3DestBucket')
     cdk.CfnOutput(self, 'FirehoseRoleArn', value=firehose_role.role_arn, export_name=f'{self.stack_name}-FirehoseRoleArn')
 

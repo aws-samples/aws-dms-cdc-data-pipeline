@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# -*- encoding: utf-8 -*-
+# vim: tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
 import json
 
@@ -147,7 +149,12 @@ class DMSAuroraMysqlToKinesisStack(Stack):
       replication_task_settings=json.dumps(task_settings_json)
     )
 
-    cdk.CfnOutput(self, 'DMSReplicationTaskId', value=dms_replication_task.replication_task_identifier)
-    cdk.CfnOutput(self, 'DMSSourceEndpointId', value=dms_source_endpoint.endpoint_identifier)
-    cdk.CfnOutput(self, 'DMSTargetEndpointId', value=dms_target_endpoint.endpoint_identifier)
-
+    cdk.CfnOutput(self, 'DMSReplicationTaskId',
+      value=dms_replication_task.replication_task_identifier,
+      export_name=f'{self.stack_name}-ReplicationTaskId')
+    cdk.CfnOutput(self, 'DMSSourceEndpointId',
+      value=dms_source_endpoint.endpoint_identifier,
+      export_name=f'{self.stack_name}-SourceEndpointId')
+    cdk.CfnOutput(self, 'DMSTargetEndpointId',
+      value=dms_target_endpoint.endpoint_identifier,
+      export_name=f'{self.stack_name}-TargetEndpointId')

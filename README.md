@@ -352,7 +352,7 @@ Secrets Manager displays the current version (`AWSCURRENT`) of the secret. To se
 7. If you would like to access the OpenSearch Cluster in a termial, open another terminal window, and then run the following commands: (in here, <i>`your-cloudformation-stack-name`</i> is `OpensearchStack`)
 
     <pre>
-    $ MASTER_USER_SECRET_ID=$(aws cloudformation describe-stacks --stack-name <i>your-cloudformation-stack-name</i> \
+    $ MASTER_USER_SECRET_ID=$(aws cloudformation describe-stacks --stack-name <i>OpenSearchStack</i> \
     | jq -r '.Stacks[0].Outputs | map(select(.OutputKey == "MasterUserSecretId")) | .[0].OutputValue')
 
     $ export OPS_SECRETS=$(aws secretsmanager get-secret-value --secret-id ${MASTER_USER_SECRET_ID} \

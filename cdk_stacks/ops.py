@@ -1,22 +1,19 @@
 #!/usr/bin/env python3
+# -*- encoding: utf-8 -*-
+# vim: tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
 import json
-import random
 import re
-import string
 
 import aws_cdk as cdk
 
 from aws_cdk import (
   Stack,
   aws_ec2,
-  aws_s3 as s3,
   aws_opensearchservice,
   aws_secretsmanager
 )
 from constructs import Construct
-
-random.seed(47)
 
 
 class OpenSearchStack(Stack):
@@ -26,7 +23,7 @@ class OpenSearchStack(Stack):
 
     #XXX: Amazon OpenSearch Service Domain naming restrictions
     # https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html#createdomains
-    OPENSEARCH_DEFAULT_DOMAIN_NAME = 'opensearch-{}'.format(''.join(random.sample((string.ascii_letters), k=5)))
+    OPENSEARCH_DEFAULT_DOMAIN_NAME = f'opensearch-{self.stack_name.lower()}'[:28]
     opensearch_domain_name = self.node.try_get_context('opensearch_domain_name') or OPENSEARCH_DEFAULT_DOMAIN_NAME
     assert re.fullmatch(r'([a-z][a-z0-9\-]+){3,28}?', opensearch_domain_name), 'Invalid domain name'
 
@@ -119,13 +116,14 @@ class OpenSearchStack(Stack):
     cdk.Tags.of(opensearch_domain).add('Name', opensearch_domain_name)
     self.ops_domain_arn = opensearch_domain.domain_arn
 
+
     cdk.CfnOutput(self, 'OpenSearchDomainEndpoint',
       value=opensearch_domain.domain_endpoint,
-      export_name='OpenSearchDomainEndpoint')
+      export_name=f'{self.stack_name}-DomainEndpoint')
     cdk.CfnOutput(self, 'OpenSearchDashboardsURL',
       value=f"{opensearch_domain.domain_endpoint}/_dashboards/",
-      export_name='OpenSearchDashboardsURL')
+      export_name=f'{self.stack_name}-DashboardsURL')
     cdk.CfnOutput(self, 'MasterUserSecretId',
       value=master_user_secret.secret_name,
-      export_name='MasterUserSecretId')
+      export_name=f'{self.stack_name}-MasterUserSecretId')
 
