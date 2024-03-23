@@ -397,7 +397,6 @@ In the next step, you map the IAM role that Kinesis Data Firehose uses to the ro
 13. Choose **Map**.
   > **Note**: After OpenSearch Role mapping for Kinesis Data Firehose, you would not be supposed to meet a data delivery failure with Kinesis Data Firehose like this:
 
-    <pre>
     Error received from the Amazon OpenSearch Service cluster or OpenSearch Serverless collection.
     If the cluster or collection is behind a VPC, ensure network configuration allows connectivity.
 
@@ -414,7 +413,6 @@ In the next step, you map the IAM role that Kinesis Data Firehose uses to the ro
       },
       "status": 403
     }
-    </pre>
 
 ## Run Test
 
