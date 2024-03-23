@@ -149,6 +149,10 @@ class DMSAuroraMysqlToKinesisStack(Stack):
       replication_task_settings=json.dumps(task_settings_json)
     )
 
+
+    cdk.CfnOutput(self, 'DMSReplicationTaskArn',
+      value=dms_replication_task.ref,
+      export_name=f'{self.stack_name}-DMSReplicationTaskArn')
     cdk.CfnOutput(self, 'DMSReplicationTaskId',
       value=dms_replication_task.replication_task_identifier,
       export_name=f'{self.stack_name}-ReplicationTaskId')

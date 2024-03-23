@@ -395,18 +395,34 @@ In the next step, you map the IAM role that Kinesis Data Firehose uses to the ro
     `arn:aws:iam::123456789012:role/firehose_stream_role_name`.
     ![ops-entries-for-firehose_role](./assets/ops-entries-for-firehose_role.png)
 13. Choose **Map**.
+  > **Note**: After OpenSearch Role mapping for Kinesis Data Firehose, you would not be supposed to meet a data delivery failure with Kinesis Data Firehose like this:
 
-**Note**: After OpenSearch Role mapping for Kinesis Data Firehose, you would not be supposed to meet a data delivery failure with Kinesis Data Firehose like this:
+    <pre>
+    Error received from the Amazon OpenSearch Service cluster or OpenSearch Serverless collection.
+    If the cluster or collection is behind a VPC, ensure network configuration allows connectivity.
 
-<pre>
-"errorMessage": "Error received from Elasticsearch cluster. {\"error\":{\"root_cause\":[{\"type\":\"security_exception\",\"reason\":\"no permissions for [indices:data/write/bulk] and User [name=arn:aws:iam::123456789012:role/KinesisFirehoseServiceRole-<i>firehose_stream_name</i>-<i>region_name</i>, backend_roles=[arn:aws:iam::123456789012:role/KinesisFirehoseServiceRole-<i>firehose_stream_name</i>-<i>region_name</i>], requestedTenant=null]\"}],\"type\":\"security_exception\",\"reason\":\"no permissions for [indices:data/write/bulk] and User [name=arn:aws:iam::123456789012:role/KinesisFirehoseServiceRole-<i>firehose_stream_name</i>-<i>region_name</i>, backend_roles=[arn:aws:iam::123456789012:role/KinesisFirehoseServiceRole-<i>firehose_stream_name</i>-<i>region_name</i>], requestedTenant=null]\"},\"status\":403}",
-</pre>
+    {
+      "error": {
+        "root_cause": [
+          {
+            "type": "security_exception",
+            "reason": "no permissions for [indices:data/write/bulk] and User [name=arn:aws:iam::123456789012:role/KinesisFirehoseServiceRole-retail-trans-us-east-1, backend_roles=[arn:aws:iam::123456789012:role/KinesisFirehoseServiceRole-retail-trans-us-east-1], requestedTenant=null]"
+          }
+        ],
+        "type": "security_exception",
+        "reason": "no permissions for [indices:data/write/bulk] and User [name=arn:aws:iam::123456789012:role/KinesisFirehoseServiceRole-retail-trans-us-east-1, backend_roles=[arn:aws:iam::123456789012:role/KinesisFirehoseServiceRole-retail-trans-us-east-1], requestedTenant=null]"
+      },
+      "status": 403
+    }
+    </pre>
 
 ## Run Test
 
 1. Start the DMS Replication task by replacing the ARN in below command.
    <pre>
-   (.venv) $ aws dms start-replication-task --replication-task-arn <i>dms-task-arn</i> --start-replication-task-type start-replication
+   (.venv) $ DMS_TASK_ARN=$(aws cloudformation describe-stacks --stack-name <i>DMSAuroraMysqlToKinesisStack</i> \
+   | jq -r '.Stacks[0].Outputs | map(select(.OutputKey == "DMSReplicationTaskArn")) | .[0].OutputValue')
+   (.venv) $ aws dms start-replication-task --replication-task-arn <i>${DMS_TASK_ARN}</i> --start-replication-task-type start-replication
    </pre>
 
 2. Generate test data.
@@ -481,7 +497,9 @@ In the next step, you map the IAM role that Kinesis Data Firehose uses to the ro
 
 1. Stop the DMS Replication task by replacing the ARN in below command.
    <pre>
-   (.venv) $ aws dms stop-replication-task --replication-task-arn <i>dms-task-arn</i>
+   (.venv) $ DMS_TASK_ARN=$(aws cloudformation describe-stacks --stack-name <i>DMSAuroraMysqlToKinesisStack</i> \
+   | jq -r '.Stacks[0].Outputs | map(select(.OutputKey == "DMSReplicationTaskArn")) | .[0].OutputValue')
+   (.venv) $ aws dms stop-replication-task --replication-task-arn <i>${DMS_TASK_ARN}</i>
    </pre>
 
 2. Delete the CloudFormation stack by running the below command.
