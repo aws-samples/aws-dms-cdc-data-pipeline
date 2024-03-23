@@ -358,7 +358,7 @@ Secrets Manager displays the current version (`AWSCURRENT`) of the secret. To se
     $ export OPS_SECRETS=$(aws secretsmanager get-secret-value --secret-id ${MASTER_USER_SECRET_ID} \
     | jq -r '.SecretString | fromjson | "\(.username):\(.password)"')
 
-    $ export OPS_DOMAIN=$(aws cloudformation describe-stacks --stack-name <i>your-cloudformation-stack-name</i> \
+    $ export OPS_DOMAIN=$(aws cloudformation describe-stacks --stack-name <i>OpenSearchStack</i> \
     | jq -r '.Stacks[0].Outputs | map(select(.OutputKey == "OpenSearchDomainEndpoint")) | .[0].OutputValue')
 
     $ curl -XGET --insecure -u "${OPS_SECRETS}" https://localhost:9200/_cluster/health?pretty=true
