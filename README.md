@@ -541,6 +541,10 @@ Enjoy!
    ![aws-msk-serverless-cdc-data-pipeline-arch](https://raw.githubusercontent.com/aws-samples/aws-msk-serverless-cdc-data-pipeline-with-debezium/main/aws-msk-connect-cdc-data-pipeline-arch.svg)
  * [aws-msk-cdc-data-pipeline-with-debezium](https://github.com/aws-samples/aws-msk-cdc-data-pipeline-with-debezium)
    ![aws-msk-cdc-data-pipeline-arch](https://raw.githubusercontent.com/aws-samples/aws-msk-cdc-data-pipeline-with-debezium/main/aws-msk-connect-cdc-data-pipeline-arch.svg)
+ * [aws-dms-serverless-to-kinesis-data-pipeline](https://github.com/aws-samples/aws-dms-serverless-to-kinesis-data-pipeline)
+   ![aws-dms-serverless-to-kinesis-data-pipeline-arch](https://raw.githubusercontent.com/aws-samples/aws-dms-serverless-to-kinesis-data-pipeline/main/dms_serverless-mysql-to-kinesis-arch.svg)
+ * [aws-dms-serverless-mysql-to-s3-migration](https://github.com/aws-samples/aws-dms-serverless-mysql-to-s3-migration)
+   ![aws-dms-serverless-mysql-to-s3-migration-arch](https://raw.githubusercontent.com/aws-samples/aws-dms-serverless-mysql-to-s3-migration/main/dms_serverless-mysql-to-s3-arch.svg)
 
 ## Security
 
